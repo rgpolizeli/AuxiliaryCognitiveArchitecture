@@ -29,14 +29,11 @@ public class ShortMemoryCodelet extends Codelet{
     private MemoryObject perceptionMO;
     private MemoryObject shortMO;
     private MemoryObject longMO;
-    //private MemoryObject workingMO;
     private MemoryObject toModifyPerceptionMO;
     private MemoryObject synchronizerMO;
     
     private Map<String, Map<Percept, Double>> shortPercepts;
     private Map<String, Map<Percept, Double>> longPercepts;
-    //private Map<String,List<Percept>> toDeleteMemory;
-    //private List<Percept> toDeletePercepts;
     private List<Percept> toModifyPercepts;
     private List<Percept> toReplacePercepts;
     
@@ -49,8 +46,6 @@ public class ShortMemoryCodelet extends Codelet{
     private double decrementPerCycle = 0.1;
     
     private Random rn;
-    
-    private final String attentionCategoryInWMO= "ATTENTION";
     
     public ShortMemoryCodelet(int perceptionCapacity, double maxActivation, double minActivation, double deleteThreshold, double replaceThreshold, double incrementPerCycle, double decrementPerCycle) {
         this.perceptionCapacity = perceptionCapacity;
@@ -80,11 +75,6 @@ public class ShortMemoryCodelet extends Codelet{
         
         return total;
     }
-    
-    
-   //////////////
-    // MemorizerCDT functions in future
-    //////////////
     
     private void insertPerceptInMemory(Percept p, MemoryObject mo){
         
@@ -116,7 +106,6 @@ public class ShortMemoryCodelet extends Codelet{
                 memoryPerceptsOfCategory = memoryPercepts.get(p.getCategory());
                 if (memoryPerceptsOfCategory.containsKey(p)) {
                     memoryPerceptsOfCategory.remove(p);
-                    //this.toDeletePercepts.add(p);
                     if (memoryPerceptsOfCategory.isEmpty()) {
                         memoryPercepts.remove(p.getCategory());
                     }
@@ -233,29 +222,6 @@ public class ShortMemoryCodelet extends Codelet{
             return this.toReplacePercepts.get(this.rn.nextInt(this.toReplacePercepts.size()));
         }
     }
-    
-    /*
-    private void removeDeletedPerceptsFromWorkingMemory(){
-        if (!this.toDeletePercepts.isEmpty()) {
-            synchronized(this.workingMO){
-                Map<String,Map<String,List<Percept>>> workingMemoryContent = (Map<String,Map<String,List<Percept>>>) this.workingMO.getI();
-                Map<String,List<Percept>> workingMemoryOfShortMemory = workingMemoryContent.get(attentionCategoryInWMO);
-                        
-                if (workingMemoryOfShortMemory != null) {
-                    for(Percept p : this.toDeletePercepts){
-                        List<Percept> perceptsOfCategory = workingMemoryOfShortMemory.get(p.getCategory());
-                        if(perceptsOfCategory != null && perceptsOfCategory.contains(p)){
-                            perceptsOfCategory.remove(p);
-                            if(perceptsOfCategory.isEmpty()){ //if the list becomes empty
-                                workingMemoryOfShortMemory.remove(p.getCategory());
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-    */    
 
     //////////////////////
     // OVERRIDE METHODS //
@@ -267,7 +233,6 @@ public class ShortMemoryCodelet extends Codelet{
         this.perceptionMO = (MemoryObject) this.getInput(MemoryObjectsNames.PERCEPTION_MO);
         this.shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
         this.longMO = (MemoryObject) this.getInput(MemoryObjectsNames.LONG_MO);
-        //this.workingMO = (MemoryObject) this.getInput(MemoryObjectsNames.WORKING_MO);
         this.toModifyPerceptionMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_MODIFY_PERCEPTION_MO);
         
         this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
@@ -288,7 +253,6 @@ public class ShortMemoryCodelet extends Codelet{
             this.longPercepts = AuxiliarMethods.deepCopyMemoryMap(this.longPercepts);
         }
         
-        //this.toDeletePercepts = new ArrayList<>();
         this.toModifyPercepts = (List<Percept>) this.toModifyPerceptionMO.getI();
         this.toReplacePercepts = new ArrayList<>();
         
@@ -345,9 +309,6 @@ public class ShortMemoryCodelet extends Codelet{
             this.toModifyPercepts.retainAll(modifiedPercepts);
         }
         
-        //removeDeletedPerceptsFromWorkingMemory();
-        
-        //AuxiliarMethods.synchronizeCodelet(super.getName(), this.synchronizerMO);
         AuxiliarMethods.synchronize(super.getName());
     }
     

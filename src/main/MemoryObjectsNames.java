@@ -22,7 +22,6 @@ public class MemoryObjectsNames {
     public static final String OPERATIONS_MO = "REASONER_OPERATIONS";
     public static final String REMEMBER_MO = "REMEMBER";
     public static final String SELF_PERCEPT_MO = "SELF_PERCEPT";
-    public static final String TO_DELETE_MO = "TO_DELETE_MO";
     public static final String TO_DELETE_LONG_MO = "TO_DELETE_LONG_MO";
     public static final String TO_MODIFY_PERCEPTION_MO = "TO_MODIFY_PERCEPTION";
     public static final String EXECUTOR_HANDLE_MO = "EXECUTOR_HANDLE";

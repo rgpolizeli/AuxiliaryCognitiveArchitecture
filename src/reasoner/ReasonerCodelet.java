@@ -39,7 +39,6 @@ public class ReasonerCodelet extends ContainerCodelet{
     private MemoryObject reasonerMO;
     private MemoryObject workingMO;
     private MemoryObject activatedAffordanceMO;
-    //private MemoryObject toDeleteMO;
     private MemoryObject synchronizerMO;
     
     private List<Drive> drives;
@@ -48,8 +47,6 @@ public class ReasonerCodelet extends ContainerCodelet{
     private List<Operation> reasonerOperations;
     private List<Long> reasonerOperationsIds;
     private Map<String,Map<Percept,Double>> reasonerPercepts;
-    //private List<Percept> toDeletePercepts;
-    private Map<String,List<Percept>> toDeleteMemory;
     private List<Percept> toReplacePercepts;
     private ConcurrentHashMap<String, Boolean> synchronizers;
    
@@ -105,11 +102,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         return total;
     }
     
-   
-    //////////////
-    // MemorizerCDT functions in future
-    //////////////
-    
     private void insertPerceptInMemory(Percept p, MemoryObject mo){
         
         synchronized(mo){
@@ -140,7 +132,6 @@ public class ReasonerCodelet extends ContainerCodelet{
                 memoryPerceptsOfCategory = memoryPercepts.get(p.getCategory());
                 if (memoryPerceptsOfCategory.containsKey(p)) {
                     memoryPerceptsOfCategory.remove(p);
-                    //this.toDeletePercepts.add(p);
                     if (memoryPerceptsOfCategory.isEmpty()) {
                         memoryPercepts.remove(p.getCategory());
                     }
@@ -417,37 +408,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         
     }
     
-    /*
-    private void addRemovedPerceptsToDeleteMO(){
-        if (!this.toDeletePercepts.isEmpty()) {
-            
-            synchronized(this.toDeleteMO){
-                Map<String,Map<String,List<Percept>>> toDeleteMemoryContent = (Map<String,Map<String,List<Percept>>>) this.toDeleteMO.getI();
-                Map<String,List<Percept>> toDeleteReasonerMemory = toDeleteMemoryContent.get(reasonerCategoryInWMO);
-                        
-                if (toDeleteReasonerMemory == null) {
-                    toDeleteReasonerMemory = new HashMap<>();
-                    toDeleteMemoryContent.put(reasonerCategoryInWMO, toDeleteReasonerMemory);
-                } 
-                
-                for(Percept p : this.toDeletePercepts){
-                    List<Percept> perceptsOfCategory = toDeleteReasonerMemory.get(p.getCategory());
-                    if(perceptsOfCategory == null){
-                        perceptsOfCategory = new ArrayList<>();
-                        perceptsOfCategory.add(p);
-                        toDeleteReasonerMemory.put(p.getCategory(), perceptsOfCategory);
-                    } else{
-                        if(!perceptsOfCategory.contains(p)){
-                            perceptsOfCategory.add(p);
-                        }
-                    }
-                }
-                
-            }
-        }
-    }
-    */
-    
     private void addReasonerPerceptsToWorkingMO(){
         synchronized(this.workingMO){
             Map<String,Map<String,List<Percept>>> workingMemory = (Map<String,Map<String,List<Percept>>>) this.workingMO.getI();
@@ -482,32 +442,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         }
     }
     
-    /*
-    private void removeDeletedPerceptsFromWorkingMemory(){
-        if(!this.toDeletePercepts.isEmpty()){
-            
-            synchronized(this.workingMO){
-                Map<String,Map<String,List<Percept>>> workingMemory = (Map<String,Map<String,List<Percept>>>) this.workingMO.getI();
-                Map<String,List<Percept>> reasonerPerceptsInWMO = workingMemory.get(this.reasonerCategoryInWMO);
-
-                if (reasonerPerceptsInWMO != null && !reasonerPerceptsInWMO.isEmpty()) {
-                    for(Percept removedPercept : this.toDeletePercepts){
-                        List<Percept> perceptsOfCategoryInWMO = reasonerPerceptsInWMO.get(removedPercept.getCategory());
-                        if(perceptsOfCategoryInWMO!= null && perceptsOfCategoryInWMO.contains(removedPercept) ){
-                            perceptsOfCategoryInWMO.remove(removedPercept);
-                            if(perceptsOfCategoryInWMO.isEmpty()){
-                                reasonerPerceptsInWMO.remove(removedPercept.getCategory());
-                            }
-                        }
-                    }
-                }
-            }
-            
-        }
-    }
-    */
-    
-    
     //////////////////////
     // OVERRIDE METHODS //
     //////////////////////
@@ -518,7 +452,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         this.operationsMO = (MemoryObject) this.getInput(MemoryObjectsNames.OPERATIONS_MO);
         this.reasonerMO = (MemoryObject) this.getInput(MemoryObjectsNames.REASONER_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoryObjectsNames.WORKING_MO);
-        //this.toDeleteMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_DELETE_MO);
         this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
     }
@@ -538,7 +471,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         
         this.reasonerPercepts = (Map<String,Map<Percept,Double>>) this.reasonerMO.getI();
         
-        //this.toDeletePercepts = new ArrayList<>();
         this.toReplacePercepts = new ArrayList<>();
         
         this.putOperationsPerceptsInReasonerMO(); //this operation must be executed before destroy Reasoner, because in this manner it is sure that the new reasoner operation have executed before will deleted.
@@ -549,12 +481,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         this.createReasonerOperation();
     
         //System.out.println("ReasonerMO: " + this.reasonerPercepts.size() + " Total: "  + this.reasonerMOCapacity);
-        
-        //if I garantee that each codelet execute in each cycle, I can refresh the toDeletePercepts here,
-        // because the percepts deleted in last cycle have been or will be deleted by forgetCDT.
-        //addRemovedPerceptsToDeleteMO();
-        
-        //removeDeletedPerceptsFromWorkingMemory();
         
         addReasonerPerceptsToWorkingMO();
         

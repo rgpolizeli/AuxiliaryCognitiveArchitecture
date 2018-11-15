@@ -30,7 +30,6 @@ public class LongMemoryCodelet extends Codelet{
     private MemoryObject shortMO;
     private MemoryObject reasonerMO;
     private MemoryObject toDeleteLongMO;
-    //private MemoryObject toDeleteMO;
     private MemoryObject synchronizerMO;
     
     private Map<String, Map<Percept, Double>> longPercepts;
@@ -50,9 +49,6 @@ public class LongMemoryCodelet extends Codelet{
     private double decrementPerCycle = 0.1;
     
     private Random rn;
-    
-    private final String rememberCategoryInWMO= "REMEMBER";
-    
     
     public LongMemoryCodelet(int longMemoryCapacity, double incrementPerCycle, double decrementPerCycle, double maxActivation, double minActivation, double memorizerThreshold, double deleteThreshold, double replaceThreshold) {
         this.longMemoryCapacity = longMemoryCapacity;
@@ -260,37 +256,6 @@ public class LongMemoryCodelet extends Codelet{
 
     }
     
-    /*
-    private void addRemovedPerceptsToDeleteMO(){
-        if (!this.toDeletePercepts.isEmpty()) {
-            
-            synchronized(this.toDeleteMO){
-                Map<String,Map<String,List<Percept>>> toDeleteMemoryContent = (Map<String,Map<String,List<Percept>>>) this.toDeleteMO.getI();
-                Map<String,List<Percept>> toDeleteLongMemory = toDeleteMemoryContent.get(rememberCategoryInWMO);
-                        
-                if (toDeleteLongMemory == null) {
-                    toDeleteLongMemory = new HashMap<>();
-                    toDeleteMemoryContent.put(rememberCategoryInWMO, toDeleteLongMemory);
-                } 
-                
-                for(Percept p : this.toDeletePercepts){
-                    List<Percept> perceptsOfCategory = toDeleteLongMemory.get(p.getCategory());
-                    if(perceptsOfCategory == null){
-                        perceptsOfCategory = new ArrayList<>();
-                        perceptsOfCategory.add(p);
-                        toDeleteLongMemory.put(p.getCategory(), perceptsOfCategory);
-                    } else{
-                        if(!perceptsOfCategory.contains(p)){
-                            perceptsOfCategory.add(p);
-                        }
-                    }
-                }
-                
-            }
-        }
-    }
-    */
-    
     private void addRemovedPerceptsToDeleteLongMO(){
         if (!this.toDeletePercepts.isEmpty()) {
             
@@ -321,7 +286,6 @@ public class LongMemoryCodelet extends Codelet{
         this.shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
         this.reasonerMO = (MemoryObject) this.getInput(MemoryObjectsNames.REASONER_MO);
         this.toDeleteLongMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_DELETE_LONG_MO);
-        //this.toDeleteMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_DELETE_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
     }
 
@@ -365,13 +329,8 @@ public class LongMemoryCodelet extends Codelet{
         Statistic.updateLongMO(countTotalOfPerceptsInMO());
         //
         
-        
-        //if I garantee that each codelet execute in each cycle, I can refresh the toDeletePercepts here,
-        // because the percepts deleted in last cycle have been or will be deleted by forgetCDT.
         addRemovedPerceptsToDeleteLongMO();
-        //addRemovedPerceptsToDeleteMO();
         
-        //AuxiliarMethods.synchronizeCodelet(super.getName(), this.synchronizerMO);
         AuxiliarMethods.synchronize(super.getName());
     }
     

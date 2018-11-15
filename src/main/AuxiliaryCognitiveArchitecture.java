@@ -42,22 +42,16 @@ public class AuxiliaryCognitiveArchitecture {
     private MemoryObject perceptionMO;
     private MemoryObject shortMO;
     private MemoryObject longMO;
-    private MemoryObject workingMO;
-    private MemoryObject driveMO;
-    private MemoryObject extractedAffordanceMO;
     private MemoryObject biasDecisionFactorsMO;
-    private MemoryObject activatedAffordanceMO;
     private MemoryObject reasonerMO;
     private MemoryObject operationsMO;
     private MemoryObject rememberMO;
-    private MemoryObject toDeleteMO;
     private MemoryObject toDeleteLongMO;
     private MemoryObject toModifyPerceptionMO;
     private MemoryObject executorHandleMO;
     private MemoryObject executorsMO;
     private MemoryObject executorParametersMO;
     private MemoryObject actuatorsMO;
-    private MemoryObject synchronizerMO;
 
     private int attentionMemoryCapacity = -1;
     private int shortMemoryCapacity = -1;
@@ -210,9 +204,6 @@ public class AuxiliaryCognitiveArchitecture {
         
         Map<DecisionFactor, List<Remember>> remembers = new HashMap<>();
         this.rememberMO = m.createMemoryObject(MemoryObjectsNames.REMEMBER_MO, remembers);
-        
-        Map<String,Map<String,List<Percept>>> toDeleteMemory = new HashMap<>();
-        this.toDeleteMO = m.createMemoryObject(MemoryObjectsNames.TO_DELETE_MO, toDeleteMemory);
         
         List<Percept> toDeleteLongMemory = new ArrayList<>();
         this.toDeleteLongMO = m.createMemoryObject(MemoryObjectsNames.TO_DELETE_LONG_MO, toDeleteLongMemory);
@@ -396,7 +387,6 @@ public class AuxiliaryCognitiveArchitecture {
         memorizerCodelet.addInput(this.longMO);
         memorizerCodelet.addInput(this.shortMO);
         memorizerCodelet.addInput(this.reasonerMO);
-        memorizerCodelet.addInput(this.toDeleteMO);
         memorizerCodelet.addInput(this.toDeleteLongMO);
         memorizerCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
         memorizerCodelet.setName("MemorizerCodelet");
@@ -407,7 +397,6 @@ public class AuxiliaryCognitiveArchitecture {
         reasonerCodelet.addInput(this.operationsMO);
         reasonerCodelet.addInput(this.reasonerMO);
         reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.WORKING_MO));
-        reasonerCodelet.addInput(this.toDeleteMO);
         reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO));
         reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
         reasonerCodelet.setName("ReasonerCodelet");
@@ -430,7 +419,6 @@ public class AuxiliaryCognitiveArchitecture {
         shortMemoryCodelet.addInput(this.perceptionMO);
         shortMemoryCodelet.addInput(this.shortMO);
         shortMemoryCodelet.addInput(this.longMO);
-        shortMemoryCodelet.addInput(this.toDeleteMO);
         shortMemoryCodelet.addInput(this.toModifyPerceptionMO);
         shortMemoryCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
         shortMemoryCodelet.setName("ShortMemoryCodelet");

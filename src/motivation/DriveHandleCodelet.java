@@ -138,7 +138,7 @@ public class DriveHandleCodelet extends Codelet{
         
         double activation;
         for (Drive d: drives) {
-            if (this.selfPercept == null) { //null quando o unifierPercept executa antes do perception
+            if (this.selfPercept == null) { //null quando o ShortMemoryCodelet executa antes do PerceptionCodelet
                 activation = d.getMinActivation();
             } else{
                 List<Property> relevantProperties = this.getDriveRelevantPropertiesFromSelfPercept(d);

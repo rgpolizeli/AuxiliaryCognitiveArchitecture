@@ -35,7 +35,6 @@ import motivation.DecisionFactor;
  */
 public class RememberCodelet extends Codelet{
 
-    private MemoryObject attentionMO;
     private MemoryObject longMO;
     private MemoryObject driveMO;
     private MemoryObject biasDecisionFactorsMO;
@@ -55,7 +54,6 @@ public class RememberCodelet extends Codelet{
     private List<BiasDecisionFactor> biasFactors;
     private Map<DecisionFactor, List<Remember>> remembers;
     private Map<String,List<Percept>> situation;
-    private List<Percept> toDeleteLongMemory;
     
     private final Map<String, Integer> notRemembers; //(String = drive name + affordance parent name + affordance name)
    
