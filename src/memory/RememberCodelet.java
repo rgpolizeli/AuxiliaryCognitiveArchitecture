@@ -11,7 +11,7 @@ import actionSelection.AuxiliarMethods;
 import actionSelection.ConsummatoryPathInfo;
 import actionSelection.ExtractedAffordance;
 import actionSelection.IntermediateAffordanceType;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import perception.Percept;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
@@ -792,15 +792,15 @@ public class RememberCodelet extends Codelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.longMO = (MemoryObject) this.getInput(MemoryObjectsNames.LONG_MO);
-        this.driveMO = (MemoryObject) this.getInput(MemoryObjectsNames.DRIVE_MO);
-        this.rememberMO = (MemoryObject) this.getInput(MemoryObjectsNames.REMEMBER_MO);
-        this.biasDecisionFactorsMO = (MemoryObject) this.getInput(MemoryObjectsNames.BIAS_DECISION_FACTORS_MO);
-        this.reasonerMO = (MemoryObject) this.getInput(MemoryObjectsNames.REASONER_MO);
-        this.workingMO = (MemoryObject) this.getInput(MemoryObjectsNames.WORKING_MO);
-        this.extractedAffordancesMO = (MemoryObject) this.getInput(MemoryObjectsNames.EXTRACTED_AFFORDANCES_MO);
-        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_DELETE_LONG_MO);
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
+        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        this.rememberMO = (MemoryObject) this.getInput(MemoriesNames.REMEMBER_MO);
+        this.biasDecisionFactorsMO = (MemoryObject) this.getInput(MemoriesNames.BIAS_DECISION_FACTORS_MO);
+        this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
+        this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
+        this.extractedAffordancesMO = (MemoryObject) this.getInput(MemoriesNames.EXTRACTED_AFFORDANCES_MO);
+        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoriesNames.TO_DELETE_LONG_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

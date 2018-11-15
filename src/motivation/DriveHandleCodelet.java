@@ -6,7 +6,7 @@
 package motivation;
 
 import actionSelection.AuxiliarMethods;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import actionSelection.Statistic;
 import perception.Percept;
 import perception.Property;
@@ -115,9 +115,9 @@ public class DriveHandleCodelet extends Codelet{
     
     @Override
     public void accessMemoryObjects() {
-        drivesMO = (MemoryObject) this.getInput(MemoryObjectsNames.DRIVE_MO);
-        shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
-        synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        drivesMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
+        synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

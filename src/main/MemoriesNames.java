@@ -9,7 +9,7 @@ package main;
  *
  * @author ricardo
  */
-public class MemoryObjectsNames {
+public class MemoriesNames {
     public static final String PERCEPTION_MO = "PERCEPTION";
     public static final String SHORT_MO = "SHORT_MEMORY";
     public static final String LONG_MO = "LONG_MEMORY";

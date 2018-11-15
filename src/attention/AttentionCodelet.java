@@ -9,7 +9,7 @@ import actionSelection.AffordanceType;
 import actionSelection.AuxiliarMethods;
 import actionSelection.ConsummatoryAffordanceType;
 import actionSelection.IntermediateAffordanceType;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import perception.Percept;
 import perception.Property;
 import br.unicamp.cst.core.entities.Codelet;
@@ -338,10 +338,10 @@ public class AttentionCodelet extends Codelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
-        this.workingMO = (MemoryObject) this.getInput(MemoryObjectsNames.WORKING_MO);
-        this.driveMO = (MemoryObject) this.getInput(MemoryObjectsNames.DRIVE_MO);
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
+        this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
+        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

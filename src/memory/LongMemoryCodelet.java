@@ -6,7 +6,7 @@
 package memory;
 
 import actionSelection.AuxiliarMethods;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import actionSelection.Statistic;
 import perception.Percept;
 import perception.Relation;
@@ -282,11 +282,11 @@ public class LongMemoryCodelet extends Codelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.longMO = (MemoryObject) this.getInput(MemoryObjectsNames.LONG_MO);
-        this.shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
-        this.reasonerMO = (MemoryObject) this.getInput(MemoryObjectsNames.REASONER_MO);
-        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_DELETE_LONG_MO);
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
+        this.shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
+        this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
+        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoriesNames.TO_DELETE_LONG_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

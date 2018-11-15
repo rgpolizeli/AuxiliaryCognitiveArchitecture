@@ -8,7 +8,7 @@ package reasoner;
 import actionSelection.AuxiliarMethods;
 import main.ContainerCodelet;
 import actionSelection.ExtractedAffordance;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import executor.ExecutorInfo;
 import motivation.Drive;
 import perception.Percept;
@@ -448,12 +448,12 @@ public class ReasonerCodelet extends ContainerCodelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.driveMO = (MemoryObject) this.getInput(MemoryObjectsNames.DRIVE_MO);
-        this.operationsMO = (MemoryObject) this.getInput(MemoryObjectsNames.OPERATIONS_MO);
-        this.reasonerMO = (MemoryObject) this.getInput(MemoryObjectsNames.REASONER_MO);
-        this.workingMO = (MemoryObject) this.getInput(MemoryObjectsNames.WORKING_MO);
-        this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO);
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        this.operationsMO = (MemoryObject) this.getInput(MemoriesNames.OPERATIONS_MO);
+        this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
+        this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
+        this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoriesNames.ACTIVATED_AFFORDANCE_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

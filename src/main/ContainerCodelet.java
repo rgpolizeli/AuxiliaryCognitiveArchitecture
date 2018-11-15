@@ -6,21 +6,16 @@
 package main;
 
 import actionSelection.AuxiliarMethods;
-import synchronization.MyLock;
 import perception.Percept;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 import br.unicamp.cst.core.entities.Mind;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
-import java.math.MathContext;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import synchronization.SynchronizerCodelet;
 
 /**
  *
@@ -166,7 +161,7 @@ public abstract class ContainerCodelet extends Codelet{
                     if (ex instanceof java.lang.NullPointerException) {
                         //not problem
                     } else{
-                      Logger.getLogger(SynchronizerCodelet.class.getName()).log(Level.SEVERE, null, ex); 
+                      
                     }
                 }
                 synchronizers.remove(codelet.getName());

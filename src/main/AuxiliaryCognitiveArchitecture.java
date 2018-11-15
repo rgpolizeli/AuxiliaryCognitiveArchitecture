@@ -185,40 +185,40 @@ public class AuxiliaryCognitiveArchitecture {
     
     public void createCognitiveArchitectureMOs(){
         Map<String,List<Percept>> perceptionPercepts = new HashMap<>();
-        this.perceptionMO = m.createMemoryObject(MemoryObjectsNames.PERCEPTION_MO, perceptionPercepts);
+        this.perceptionMO = m.createMemoryObject(MemoriesNames.PERCEPTION_MO, perceptionPercepts);
         
         Map<String, Map<Percept, Double>> shortMemoryMap = new HashMap();
-        this.shortMO = m.createMemoryObject(MemoryObjectsNames.SHORT_MO, shortMemoryMap);
+        this.shortMO = m.createMemoryObject(MemoriesNames.SHORT_MO, shortMemoryMap);
         
         Map<String, Map<Percept, Double>> longMemoryMap = new HashMap();
-        this.longMO = m.createMemoryObject(MemoryObjectsNames.LONG_MO, longMemoryMap);
+        this.longMO = m.createMemoryObject(MemoriesNames.LONG_MO, longMemoryMap);
         
         List<BiasDecisionFactor> bias = new ArrayList<>();
-        this.biasDecisionFactorsMO = m.createMemoryObject(MemoryObjectsNames.BIAS_DECISION_FACTORS_MO, bias);
+        this.biasDecisionFactorsMO = m.createMemoryObject(MemoriesNames.BIAS_DECISION_FACTORS_MO, bias);
         
         Map<Operation, List<Percept>> reasonerPercepts = new HashMap<>();
-        this.reasonerMO = m.createMemoryObject(MemoryObjectsNames.REASONER_MO, reasonerPercepts);
+        this.reasonerMO = m.createMemoryObject(MemoriesNames.REASONER_MO, reasonerPercepts);
         
         List<Operation> reasonerOperations = new ArrayList<>();
-        this.operationsMO = m.createMemoryObject(MemoryObjectsNames.OPERATIONS_MO, reasonerOperations);
+        this.operationsMO = m.createMemoryObject(MemoriesNames.OPERATIONS_MO, reasonerOperations);
         
         Map<DecisionFactor, List<Remember>> remembers = new HashMap<>();
-        this.rememberMO = m.createMemoryObject(MemoryObjectsNames.REMEMBER_MO, remembers);
+        this.rememberMO = m.createMemoryObject(MemoriesNames.REMEMBER_MO, remembers);
         
         List<Percept> toDeleteLongMemory = new ArrayList<>();
-        this.toDeleteLongMO = m.createMemoryObject(MemoryObjectsNames.TO_DELETE_LONG_MO, toDeleteLongMemory);
+        this.toDeleteLongMO = m.createMemoryObject(MemoriesNames.TO_DELETE_LONG_MO, toDeleteLongMemory);
         
         List<Percept> toModifyPerception = new ArrayList<>();
-        this.toModifyPerceptionMO = m.createMemoryObject(MemoryObjectsNames.TO_MODIFY_PERCEPTION_MO, toModifyPerception);
+        this.toModifyPerceptionMO = m.createMemoryObject(MemoriesNames.TO_MODIFY_PERCEPTION_MO, toModifyPerception);
         
-        this.actuatorsMO = m.createMemoryObject(MemoryObjectsNames.ACTUATORS_MO);
-        this.executorHandleMO = m.createMemoryObject(MemoryObjectsNames.EXECUTOR_HANDLE_MO, Boolean.FALSE);
-        this.executorParametersMO = m.createMemoryObject(MemoryObjectsNames.EXECUTOR_PARAMETERS_MO);
-        this.executorsMO = m.createMemoryObject(MemoryObjectsNames.EXECUTORS_MO);
+        this.actuatorsMO = m.createMemoryObject(MemoriesNames.ACTUATORS_MO);
+        this.executorHandleMO = m.createMemoryObject(MemoriesNames.EXECUTOR_HANDLE_MO, Boolean.FALSE);
+        this.executorParametersMO = m.createMemoryObject(MemoriesNames.EXECUTOR_PARAMETERS_MO);
+        this.executorsMO = m.createMemoryObject(MemoriesNames.EXECUTORS_MO);
     }
     
     public void createProxyMO(Class proxyClass, Object proxy){
-        m.createMemoryObject(MemoryObjectsNames.PROXY_MO, proxyClass.cast(proxy));
+        m.createMemoryObject(MemoriesNames.PROXY_MO, proxyClass.cast(proxy));
     }
     
     private void validParameters(){
@@ -367,17 +367,17 @@ public class AuxiliaryCognitiveArchitecture {
         
         AttentionCodelet attentionCodelet = new AttentionCodelet(this.salienceProperties, this.salienceBias, this.attentionMemoryCapacity);
         attentionCodelet.addInput(this.shortMO);
-        attentionCodelet.addInput(getMemoryByName(MemoryObjectsNames.WORKING_MO));
-        attentionCodelet.addInput(getMemoryByName(MemoryObjectsNames.DRIVE_MO));
-        attentionCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        attentionCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
+        attentionCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
+        attentionCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         attentionCodelet.setName("AttentionCodelet");
         this.m.insertCodelet(attentionCodelet);
         
         ExecutorHandleCodelet executorHandleCodelet = new ExecutorHandleCodelet();
         executorHandleCodelet.addInput(this.executorsMO);
         executorHandleCodelet.addInput(this.executorHandleMO);
-        executorHandleCodelet.addInput(getMemoryByName(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO));
-        executorHandleCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        executorHandleCodelet.addInput(getMemoryByName(MemoriesNames.ACTIVATED_AFFORDANCE_MO));
+        executorHandleCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         
         executorHandleCodelet.addOutput(this.executorParametersMO);
         executorHandleCodelet.setName("ExecutorHandleCodelet");
@@ -388,30 +388,30 @@ public class AuxiliaryCognitiveArchitecture {
         memorizerCodelet.addInput(this.shortMO);
         memorizerCodelet.addInput(this.reasonerMO);
         memorizerCodelet.addInput(this.toDeleteLongMO);
-        memorizerCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        memorizerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         memorizerCodelet.setName("MemorizerCodelet");
         this.m.insertCodelet(memorizerCodelet);
         
         ReasonerCodelet reasonerCodelet = new ReasonerCodelet(this.m, this.operationsMap, this.reasonerMemoryCapacity, this.reasonerMaxActivation, this.reasonerMinActivation, this.reasonerDeleteThreshold, this.reasonerReplaceThreshold, this.reasonerIncrementPerCycle, this.reasonerDecrementPerCycle);
-        reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.DRIVE_MO));
+        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         reasonerCodelet.addInput(this.operationsMO);
         reasonerCodelet.addInput(this.reasonerMO);
-        reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.WORKING_MO));
-        reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO));
-        reasonerCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
+        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.ACTIVATED_AFFORDANCE_MO));
+        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         reasonerCodelet.setName("ReasonerCodelet");
         this.m.insertCodelet(reasonerCodelet);
         
         RememberCodelet rememberCodelet = new RememberCodelet(this.rememberCapacity, 15, this.rememberDuration, this.rememberDecrement, this.rememberForgetThreshold);
-        rememberCodelet.addInput(getMemoryByName(MemoryObjectsNames.WORKING_MO));
+        rememberCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
         rememberCodelet.addInput(this.longMO);
-        rememberCodelet.addInput(getMemoryByName(MemoryObjectsNames.DRIVE_MO));
+        rememberCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         rememberCodelet.addInput(this.biasDecisionFactorsMO);
         rememberCodelet.addInput(this.reasonerMO);
         rememberCodelet.addInput(this.rememberMO);
-        rememberCodelet.addInput(getMemoryByName(MemoryObjectsNames.EXTRACTED_AFFORDANCES_MO));
+        rememberCodelet.addInput(getMemoryByName(MemoriesNames.EXTRACTED_AFFORDANCES_MO));
         rememberCodelet.addInput(this.toDeleteLongMO);
-        rememberCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        rememberCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         rememberCodelet.setName("RememberCodelet");
         this.m.insertCodelet(rememberCodelet);
         
@@ -420,14 +420,14 @@ public class AuxiliaryCognitiveArchitecture {
         shortMemoryCodelet.addInput(this.shortMO);
         shortMemoryCodelet.addInput(this.longMO);
         shortMemoryCodelet.addInput(this.toModifyPerceptionMO);
-        shortMemoryCodelet.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
+        shortMemoryCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         shortMemoryCodelet.setName("ShortMemoryCodelet");
         this.m.insertCodelet(shortMemoryCodelet);
         
         DriveHandleCodelet driveHandleCdt = new DriveHandleCodelet(this.selfPerceptCategory, this.relevantPerceptsIncrement);
         driveHandleCdt.addInput(this.shortMO);
-        driveHandleCdt.addInput(getMemoryByName(MemoryObjectsNames.SYNCHRONIZER_MO));
-        driveHandleCdt.addInput(getMemoryByName(MemoryObjectsNames.DRIVE_MO));
+        driveHandleCdt.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
+        driveHandleCdt.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         driveHandleCdt.setName("DriveHandleCodelet");
         this.m.insertCodelet(driveHandleCdt);
         

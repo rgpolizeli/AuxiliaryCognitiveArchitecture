@@ -6,7 +6,7 @@
 package memory;
 
 import actionSelection.AuxiliarMethods;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import actionSelection.Statistic;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
@@ -230,12 +230,12 @@ public class ShortMemoryCodelet extends Codelet{
     @Override
     public void accessMemoryObjects() {
         
-        this.perceptionMO = (MemoryObject) this.getInput(MemoryObjectsNames.PERCEPTION_MO);
-        this.shortMO = (MemoryObject) this.getInput(MemoryObjectsNames.SHORT_MO);
-        this.longMO = (MemoryObject) this.getInput(MemoryObjectsNames.LONG_MO);
-        this.toModifyPerceptionMO = (MemoryObject) this.getInput(MemoryObjectsNames.TO_MODIFY_PERCEPTION_MO);
+        this.perceptionMO = (MemoryObject) this.getInput(MemoriesNames.PERCEPTION_MO);
+        this.shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
+        this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
+        this.toModifyPerceptionMO = (MemoryObject) this.getInput(MemoriesNames.TO_MODIFY_PERCEPTION_MO);
         
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
     @Override

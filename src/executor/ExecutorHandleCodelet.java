@@ -7,7 +7,7 @@ package executor;
 
 import actionSelection.AuxiliarMethods;
 import actionSelection.ExtractedAffordance;
-import actionSelection.MemoryObjectsNames;
+import main.MemoriesNames;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.Map;
@@ -42,12 +42,12 @@ public class ExecutorHandleCodelet extends Codelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.executorsMO = (MemoryObject) this.getInput(MemoryObjectsNames.EXECUTORS_MO);
-        this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoryObjectsNames.ACTIVATED_AFFORDANCE_MO);
-        this.executorHandleMO = (MemoryObject) this.getInput(MemoryObjectsNames.EXECUTOR_HANDLE_MO);
-        this.synchronizerMO = (MemoryObject) this.getInput(MemoryObjectsNames.SYNCHRONIZER_MO);
+        this.executorsMO = (MemoryObject) this.getInput(MemoriesNames.EXECUTORS_MO);
+        this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoriesNames.ACTIVATED_AFFORDANCE_MO);
+        this.executorHandleMO = (MemoryObject) this.getInput(MemoriesNames.EXECUTOR_HANDLE_MO);
+        this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
         
-        this.executorParametersMO = (MemoryObject) this.getOutput(MemoryObjectsNames.EXECUTOR_PARAMETERS_MO);
+        this.executorParametersMO = (MemoryObject) this.getOutput(MemoriesNames.EXECUTOR_PARAMETERS_MO);
     }
 
     @Override
