@@ -19,7 +19,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
-import motivation.BiasDecisionFactor;
 import motivation.Drive;
 
 /**
@@ -58,13 +57,10 @@ public class AttentionCodelet extends Codelet{
     private Map<String,List<Percept>> attentionPercepts;
     private Map<String,Map<Percept, Double>> shortPerceptsMap;
     private List<Drive> drives;
-    private List<BiasDecisionFactor> bias;
-    private Map<String,List<Percept>> situation;
 
     private List<Property> salientProperties;
     private double salienceBias = 0.3;
     private double drivesBias = 0.4;
-    private double biasDecisionFactorsBias = 0.3;
 
     private int memoryCapacity = 0;
     
@@ -92,9 +88,6 @@ public class AttentionCodelet extends Codelet{
             for (Percept p : perceptsMap.keySet()) {
 
                 double totalValue = 0.0;
-
-                //bias decision factors
-                //totalValue += computeBiasDecisionFactorsBenefit(p);
 
                 //action decision factors
                 totalValue += computeDrivesBenefit(p);
@@ -292,18 +285,6 @@ public class AttentionCodelet extends Codelet{
         }
         
         return benefit;
-    }
-    
-    private double computeBiasDecisionFactorsBenefit(Percept p){
-        double benefit = 0.0;
-        
-        for (BiasDecisionFactor biasFactor : this.bias) {
-            if (biasFactor.isRelevantPercept(p, this.situation)) {
-                benefit += biasFactor.getValue();
-            }
-        }
-        
-        return (this.biasDecisionFactorsBias*benefit);
     }
     
     private int countTotalOfPerceptsInMO(Map<String, List<Percept>> percepts){

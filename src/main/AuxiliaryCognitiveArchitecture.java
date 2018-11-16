@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import motivation.BiasDecisionFactor;
 import motivation.DecisionFactor;
 import motivation.Drive;
 import motivation.DriveHandleCodelet;
@@ -42,7 +41,6 @@ public class AuxiliaryCognitiveArchitecture {
     private MemoryObject perceptionMO;
     private MemoryObject shortMO;
     private MemoryObject longMO;
-    private MemoryObject biasDecisionFactorsMO;
     private MemoryObject reasonerMO;
     private MemoryObject operationsMO;
     private MemoryObject rememberMO;
@@ -96,7 +94,6 @@ public class AuxiliaryCognitiveArchitecture {
     private double relevantPerceptsIncrement = -1.0;
     
     private List<Drive> drives;
-    private List<BiasDecisionFactor> bias;
     
     public AuxiliaryCognitiveArchitecture(Mind m) {
         this.m = m;
@@ -106,11 +103,6 @@ public class AuxiliaryCognitiveArchitecture {
     
     public void setSelfPerceptCategory(String selfPcptCategory){
         this.selfPerceptCategory = selfPcptCategory;
-    }
-    
-    public void setBiasDecisionFactors(List<BiasDecisionFactor> bias){
-        this.bias = bias;
-        this.biasDecisionFactorsMO.setI(this.bias);
     }
     
     public void setDriveHandleParameters(double relevantPerceptsIncrement){
@@ -192,9 +184,6 @@ public class AuxiliaryCognitiveArchitecture {
         
         Map<String, Map<Percept, Double>> longMemoryMap = new HashMap();
         this.longMO = m.createMemoryObject(MemoriesNames.LONG_MO, longMemoryMap);
-        
-        List<BiasDecisionFactor> bias = new ArrayList<>();
-        this.biasDecisionFactorsMO = m.createMemoryObject(MemoriesNames.BIAS_DECISION_FACTORS_MO, bias);
         
         Map<Operation, List<Percept>> reasonerPercepts = new HashMap<>();
         this.reasonerMO = m.createMemoryObject(MemoriesNames.REASONER_MO, reasonerPercepts);
@@ -406,7 +395,6 @@ public class AuxiliaryCognitiveArchitecture {
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
         rememberCodelet.addInput(this.longMO);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
-        rememberCodelet.addInput(this.biasDecisionFactorsMO);
         rememberCodelet.addInput(this.reasonerMO);
         rememberCodelet.addInput(this.rememberMO);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.EXTRACTED_AFFORDANCES_MO));

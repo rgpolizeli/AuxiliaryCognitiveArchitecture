@@ -16,7 +16,6 @@ public class MemoriesNames {
     public static final String DRIVE_MO = "DRIVE"; 
     public static final String WORKING_MO = "WORKING_MEMORY"; 
     public static final String EXTRACTED_AFFORDANCES_MO = "EXTRACTED_AFFORDANCE";
-    public static final String BIAS_DECISION_FACTORS_MO = "BIAS_DECISION_FACTORS";
     public static final String ACTIVATED_AFFORDANCE_MO = "ACTIVATED_AFFORDANCE";
     public static final String REASONER_MO = "REASONER";
     public static final String OPERATIONS_MO = "REASONER_OPERATIONS";

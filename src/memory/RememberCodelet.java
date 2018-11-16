@@ -26,7 +26,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
-import motivation.BiasDecisionFactor;
 import motivation.DecisionFactor;
 
 /**
@@ -37,28 +36,19 @@ public class RememberCodelet extends Codelet{
 
     private MemoryObject longMO;
     private MemoryObject driveMO;
-    private MemoryObject biasDecisionFactorsMO;
-    private MemoryObject reasonerMO;
     private MemoryObject rememberMO;
     private MemoryObject workingMO;
     private MemoryObject extractedAffordancesMO;
     private MemoryObject toDeleteLongMO;
-    private List<ExtractedAffordance> extractedAffordances;
-    
     private MemoryObject synchronizerMO;
     
+    private List<ExtractedAffordance> extractedAffordances;
     private Map<String,List<Percept>> attentionPercepts;
     private Map<String,Map<Percept,Double>> memoryPercepts;
-    private Map<String,Map<Percept,Double>> reasonerPercepts;
     private List<Drive> drives;
-    private List<BiasDecisionFactor> biasFactors;
     private Map<DecisionFactor, List<Remember>> remembers;
-    private Map<String,List<Percept>> situation;
-    
     private final Map<String, Integer> notRemembers; //(String = drive name + affordance parent name + affordance name)
-   
     private Map<Drive, Double> drivesActivations;
-    private Map<BiasDecisionFactor, Double> biasFactorsActivations;
     
     private final int totalMemoryCapacity;
     private final int totalPerceptsPerCategory;
@@ -86,6 +76,7 @@ public class RememberCodelet extends Codelet{
     //////////////////////
     // AUXILIARY METHODS //
     //////////////////////
+    
     class AffordanceAndParent{
         public AffordanceType affordance;
         public AffordanceType parentAffordance;
@@ -94,9 +85,7 @@ public class RememberCodelet extends Codelet{
             this.affordance = affordance;
             this.parentAffordance = parentAffordance;
         }
-        
     }
-    
     
     /**
      * Verifies if there is at least one of the percepts extracted from the memory of each type of percept necessary for the execution of affordance extracted from memory. If any type is missing, check if there is at least one percept of this type in the perception, making affordance executable.
@@ -246,7 +235,7 @@ public class RememberCodelet extends Codelet{
         
         if (remembersToDrive!=null) {
             
-            for (Remember r : new ArrayList<>(remembersToDrive)) { //se eu removo da lista, como posso pegar pelo indice? Sendo que o indice não mais será o mesmo do da cópia.
+            for (Remember r : new ArrayList<>(remembersToDrive)) { 
                 
                 AffordanceAndParent currentAff = new AffordanceAndParent(r.getCurrentAff(), r.getParentAff());
                 if (!isInExtractedAffordances(drive,currentAff)) {
@@ -356,53 +345,11 @@ public class RememberCodelet extends Codelet{
         */
     }
     
-    /*
-    private void createRememberToBiasDecisionFactors(BiasDecisionFactor factor){
-        Remember rb = null;
-        Map<String,List<Percept>> relevantPercepts = this.getRelevantPercepts(factor, this.memoryPercepts);
-        
-        Iterator<List<Percept>> it = relevantPercepts.values().iterator();
-        
-        while (it.hasNext() && rb == null) {
-            List<Percept> relevantPerceptsList = it.next();
-            if (!relevantPerceptsList.isEmpty()) {
-                rb = new Remember(null,null,1,relevantPercepts);
-            }
-        }
-        
-        if (rb != null) {
-            if (this.remembers.containsKey(factor)) {
-                synchronized(this.rememberMO){
-                        this.remembers.replace(factor, rb);
-                        this.rememberMO.setI(this.remembers);
-                }
-            } else{
-                synchronized(this.rememberMO){
-                    this.remembers.put(factor, rb);
-                    this.rememberMO.setI(this.remembers);
-                }
-            }
-        }
-       
-    }
-    */
-    
-    
-    
-    
     private void computeDrivesActivations(){
         this.drivesActivations = new HashMap<>();
         
         for (Drive factor : this.drives) {
             drivesActivations.put(factor, factor.getValue());
-        }
-    }
-    
-    private void computeBiasDecisionFactorsActivations(){
-        this.biasFactorsActivations = new HashMap<>();
-        
-        for (BiasDecisionFactor factor : this.biasFactors) {
-            this.biasFactorsActivations.put(factor, factor.getValue());
         }
     }
     
@@ -450,36 +397,6 @@ public class RememberCodelet extends Codelet{
         return relevantPercepts;
     }
     
-    public Map<String, List<Percept>> getRelevantPercepts(BiasDecisionFactor factor, Map<String, Map<Percept,Double>> perceptsMap){ //find relevant concepts with properties to affordance. 
-        
-        Map<String, List<Percept>> relevantPercepts = new HashMap();
-        List<String> relevantPerceptCategories = factor.getRelevantPerceptsCategories();
-        
-        for (String perceptCategory : relevantPerceptCategories) {
-        
-            Map<Percept, Double> perceptsOfCategory = perceptsMap.get(perceptCategory);
-            if (perceptsOfCategory!=null) {
-                for (Percept percept : perceptsOfCategory.keySet()) {
-               
-                    if (factor.isRelevantPercept(percept, this.situation)) { //if percept is relevant to biasFactor
-                        List<Percept> percepts;
-                        if (relevantPercepts.containsKey(perceptCategory)) {
-                            percepts = relevantPercepts.get(perceptCategory);
-                        } else{
-                            percepts = new ArrayList<>();
-                        }
-                        percepts.add(percept);
-                        relevantPercepts.put(perceptCategory, percepts);
-                    }
-                
-                }
-            }
-            
-        }
-        
-        return relevantPercepts;
-    }
-    
     public List<Percept> getRelevantPerceptsByCategory(AffordanceType aff, String perceptCategory, List<Percept> perceptsInput){ //find relevant concepts with properties to affordance. 
         
         List<Percept> relevantPercepts = new ArrayList<>();
@@ -499,121 +416,32 @@ public class RememberCodelet extends Codelet{
         return this.rememberDuration;
     }
     
-    
-    
     public double getRememberDecrement(){
         return this.rememberDecrement;
     }
-    
-    
     
     public int getMemoryCapacity() {
         return totalMemoryCapacity;
     }
     
-    private Map<String,List<Percept>> mountCurrentSituation(){
-        Map<String,List<Percept>> currentSituation = new HashMap<>();
+    private Drive getLastDrive(List<Entry<Drive,Double>> drivesValuesOrdered){
+        Drive lastDrive = null;
         
-        // ATTENTION //
-        currentSituation.putAll(this.attentionPercepts);
-        
-        
-        //REASONER //
-        for (Map.Entry<String, Map<Percept,Double>> entry : this.reasonerPercepts.entrySet()) {
-            String category = entry.getKey();
-            Map<Percept, Double> perceptsOfCategoryMap = entry.getValue();
-            
-            if (currentSituation.containsKey(category)) {
-                List<Percept> perceptsOfCategory = currentSituation.get(category);
-                for (Percept p : perceptsOfCategoryMap.keySet()) {
-                    if (!perceptsOfCategory.contains(p)) {
-                        perceptsOfCategory.add(p);
-                    }
-                }
-            } else{
-                List<Percept> perceptsOfCategory = new ArrayList<>();
-                perceptsOfCategory.addAll(perceptsOfCategoryMap.keySet());
-                currentSituation.put(category, perceptsOfCategory);
-            }
-            
+        if (!drivesValuesOrdered.isEmpty()) { 
+            lastDrive = drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getKey();
         }
         
-        // REMEMBERED //
-        
-        for (List<Remember> rbList : this.remembers.values()) {
-            for (Remember rb : rbList) {
-                for (Map.Entry<String, List<Percept>> entry : rb.getRelevantPercepts().entrySet()) {
-                    String category = entry.getKey();
-                    List<Percept> rememberedPerceptsList = entry.getValue();
-
-                    if (currentSituation.containsKey(category)) {
-                        List<Percept> perceptsOfCategory = currentSituation.get(category);
-                        for (Percept rememberedPercept : rememberedPerceptsList) {
-                            if (!perceptsOfCategory.contains(rememberedPercept)) {
-                                perceptsOfCategory.add(rememberedPercept);
-                            }
-                        }
-                    } else{
-                        List<Percept> perceptsOfCategory = new ArrayList<>();
-                        perceptsOfCategory.addAll(rememberedPerceptsList);
-                        currentSituation.put(category, perceptsOfCategory);
-                    }
-                }
-            }
-            
-        }
-        
-        return currentSituation;
+        return lastDrive;
     }
     
-    private class LastFactorEntry{
-        public DecisionFactor factor;
-        public double value;
-        public String type;
-
-        public LastFactorEntry(DecisionFactor factor, double value, String type) {
-            this.factor = factor;
-            this.value = value;
-            this.type = type;
-        }
-    }
-    
-    private LastFactorEntry getLastFactor(List<Entry<Drive,Double>> drivesValuesOrdered,List<Entry<BiasDecisionFactor,Double>> biasFactorsValuesOrdered){
-        LastFactorEntry lastDriveEntry;
-        LastFactorEntry lastBiasDecisionFactorEntry;
-        
-        if (drivesValuesOrdered.isEmpty()) { //if drives empty, biasDecisionFactor isn't empty necessary.
-            lastBiasDecisionFactorEntry = new LastFactorEntry(biasFactorsValuesOrdered.get(biasFactorsValuesOrdered.size()-1).getKey(), biasFactorsValuesOrdered.get(biasFactorsValuesOrdered.size()-1).getValue(), BiasDecisionFactor.class.getName());
-            return lastBiasDecisionFactorEntry;
-        }
-        
-        if (biasFactorsValuesOrdered.isEmpty()) {
-            lastDriveEntry = new LastFactorEntry(drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getKey(), drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getValue(),Drive.class.getName());
-            return lastDriveEntry;
-        }
-        
-        lastDriveEntry = new LastFactorEntry(drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getKey(), drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getValue(),Drive.class.getName());
-        lastBiasDecisionFactorEntry = new LastFactorEntry(biasFactorsValuesOrdered.get(biasFactorsValuesOrdered.size()-1).getKey(), biasFactorsValuesOrdered.get(biasFactorsValuesOrdered.size()-1).getValue(),BiasDecisionFactor.class.getName());
-        
-        if (lastDriveEntry.value < lastBiasDecisionFactorEntry.value) {
-            return lastDriveEntry;
-        }else{
-            return lastBiasDecisionFactorEntry;
-        }
-    }
-    
-    private void removeLastFactor(LastFactorEntry lastFactor,List<Entry<Drive,Double>> drivesValuesOrdered,List<Entry<BiasDecisionFactor,Double>> biasFactorsValuesOrdered){
+    private void removeLastDrive(Drive lastDrive,List<Entry<Drive,Double>> drivesValuesOrdered){
         
         synchronized(this.rememberMO){
-            this.remembers.remove(lastFactor.factor);
+            this.remembers.remove(lastDrive);
             this.rememberMO.setI(this.remembers);
         }
-        
-        if (lastFactor.type.equals(BiasDecisionFactor.class.getName())) {
-            biasFactorsValuesOrdered.remove(biasFactorsValuesOrdered.size()-1);
-        } else{ //it is Drive
-            drivesValuesOrdered.remove(drivesValuesOrdered.size()-1);
-        }
+ 
+        drivesValuesOrdered.remove(drivesValuesOrdered.size()-1);       
     }
     
     private int countTotalOfPerceptsInRememberMO(){
@@ -632,14 +460,14 @@ public class RememberCodelet extends Codelet{
         return total;
     }
     
-    private void insertInRememberMO(Drive drive, List<Entry<Drive,Double>> drivesValuesOrdered, List<Entry<BiasDecisionFactor,Double>> biasFactorsValuesOrdered){
+    private void insertInRememberMO(Drive drive, List<Entry<Drive,Double>> drivesValuesOrdered){
         
         List<Remember> newRemembers = null;
         
         if (countTotalOfPerceptsInRememberMO() == this.getMemoryCapacity()) { //full memory, try remove the last factor
-            LastFactorEntry lastFactorEntry = this.getLastFactor(drivesValuesOrdered, biasFactorsValuesOrdered);
-            if (!drive.equals(lastFactorEntry.factor)) { 
-                this.removeLastFactor(lastFactorEntry, drivesValuesOrdered, biasFactorsValuesOrdered);
+            Drive lastDrive = this.getLastDrive(drivesValuesOrdered);
+            if (!drive.equals(lastDrive)) { 
+                this.removeLastDrive(lastDrive, drivesValuesOrdered);
             }
             
             if (countTotalOfPerceptsInRememberMO() < this.getMemoryCapacity()) { //if the last factor is removed.
@@ -653,9 +481,9 @@ public class RememberCodelet extends Codelet{
         if (newRemembers!=null) {
             for (Remember r : newRemembers) {
                 if (countTotalOfPerceptsInRememberMO() == this.getMemoryCapacity()){ //full memory, try remove the last factor
-                    LastFactorEntry lastFactorEntry = this.getLastFactor(drivesValuesOrdered, biasFactorsValuesOrdered);
-                    if (!drive.equals(lastFactorEntry.factor)) { 
-                        this.removeLastFactor(lastFactorEntry, drivesValuesOrdered, biasFactorsValuesOrdered);
+                    Drive lastDrive = this.getLastDrive(drivesValuesOrdered);
+                    if (!drive.equals(lastDrive)) { 
+                        this.removeLastDrive(lastDrive, drivesValuesOrdered);
                     }
                 } 
 
@@ -669,8 +497,6 @@ public class RememberCodelet extends Codelet{
                 }
             }
         }
-        
-        
     }
     
     private void removeDeletedPerceptsFromRemembers(){
@@ -795,8 +621,6 @@ public class RememberCodelet extends Codelet{
         this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
         this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
         this.rememberMO = (MemoryObject) this.getInput(MemoriesNames.REMEMBER_MO);
-        this.biasDecisionFactorsMO = (MemoryObject) this.getInput(MemoriesNames.BIAS_DECISION_FACTORS_MO);
-        this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
         this.extractedAffordancesMO = (MemoryObject) this.getInput(MemoriesNames.EXTRACTED_AFFORDANCES_MO);
         this.toDeleteLongMO = (MemoryObject) this.getInput(MemoriesNames.TO_DELETE_LONG_MO);
@@ -825,87 +649,47 @@ public class RememberCodelet extends Codelet{
         
             this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
 
-            this.biasFactors = new CopyOnWriteArrayList((List<BiasDecisionFactor>) this.biasDecisionFactorsMO.getI() );
-            
-            synchronized(this.reasonerMO){
-                this.reasonerPercepts = (Map<String,Map<Percept,Double>>) this.reasonerMO.getI();
-                this.reasonerPercepts = AuxiliarMethods.deepCopyMemoryMap(this.reasonerPercepts);
-            }
-
             this.remembers = (Map<DecisionFactor, List<Remember>>) this.rememberMO.getI(); //don´t necessary save a actual version of this MO;
-
-            this.situation = this.mountCurrentSituation();
             
             if (this.remembers.isEmpty() || (!this.remembers.isEmpty() && (this.AffordanceExtractorTimeStamp == -Long.MIN_VALUE || this.extractedAffordancesMO.getTimestamp() > this.AffordanceExtractorTimeStamp)) ){ //all remembers were read.
                
                 this.computeDrivesActivations(); // mount a map for drives to order;
-                this.computeBiasDecisionFactorsActivations(); // mount a map for biasDecisionFactors to order;
                 List<Entry<Drive,Double>> drivesValuesOrdered = AuxiliarMethods.descSortEntriesByValues(this.drivesActivations);
-                List<Entry<BiasDecisionFactor,Double>> biasFactorsValuesOrdered = AuxiliarMethods.descSortEntriesByValues(this.biasFactorsActivations);
-               
-                //synchronized(this.extractedAffordancesMO){
-                    //this.extractedAffordances = (List<ExtractedAffordance>) this.extractedAffordancesMO.getI();
                     
-                    List<ExtractedAffordance> newExtractedAffordances = new CopyOnWriteArrayList((List<ExtractedAffordance>) this.extractedAffordancesMO.getI() );
-                    
-                    //if (newExtractedAffordances.size()>0 && !newExtractedAffordances.equals(this.extractedAffordances)) { //only when there are extracted affordances and when extracted aff is different of old extracted affordances.
-                        this.extractedAffordances = newExtractedAffordances;
-                        decrementNotRemembers();
-                        decrementRemembers();
+                this.extractedAffordances = new CopyOnWriteArrayList((List<ExtractedAffordance>) this.extractedAffordancesMO.getI() );
+                
+                decrementNotRemembers();
+                decrementRemembers();
                         
-                        synchronized(this.rememberMO){ //necessary to synchronize with affordanceExtractorCodelet
-                            for (Entry<Drive,Double> entry : drivesValuesOrdered) {
+                synchronized(this.rememberMO){ //necessary to synchronize with affordanceExtractorCodelet
+                    for (Entry<Drive,Double> entry : drivesValuesOrdered) {
 
-                                Drive drive = entry.getKey();
-                                updateRemembersToDrive(drive);
-                                insertInRememberMO(drive,drivesValuesOrdered,biasFactorsValuesOrdered);
-                            }
-                            
-                            /*
-                            System.out.println("#########NEW REMEMBER CYCLE###########");
-                            
-                            for (List<Remember> rbList : this.remembers.values()) {
-                                for (Remember rb : rbList) {
-                                    for (List<Percept> percepts : rb.getRelevantPercepts().values()) {
-                                        for (Percept p: percepts) {
-                                            if (p.getCategory().contains("FOOD") || p.getCategory().equals("JEWEL")) {
-                                                System.out.println(p.getPropertyByType("NAMEID=").getValue());
-                                            }else{
-                                                System.out.println(p.getCategory());
-                                            }
-                                        }
+                        Drive drive = entry.getKey();
+                        updateRemembersToDrive(drive);
+                        insertInRememberMO(drive,drivesValuesOrdered);
+                    }
+
+                    /*
+                    System.out.println("#########NEW REMEMBER CYCLE###########");
+
+                    for (List<Remember> rbList : this.remembers.values()) {
+                        for (Remember rb : rbList) {
+                            for (List<Percept> percepts : rb.getRelevantPercepts().values()) {
+                                for (Percept p: percepts) {
+                                    if (p.getCategory().contains("FOOD") || p.getCategory().equals("JEWEL")) {
+                                        System.out.println(p.getPropertyByType("NAMEID=").getValue());
+                                    }else{
+                                        System.out.println(p.getCategory());
                                     }
                                 }
                             }
-                            
-                            System.out.println("");
-                            */
-                            this.AffordanceExtractorTimeStamp = this.extractedAffordancesMO.getTimestamp();
-                        }
-                    //}
-                    
-                //}
-
-                /*
-                for (Entry<BiasDecisionFactor,Double> entry : biasFactorsValuesOrdered) {
-
-                    BiasDecisionFactor factor = entry.getKey();
-
-                    if (remembers.containsKey(factor)) { //if factor already in rememberMO
-                        this.createRememberToBiasDecisionFactors(factor);
-                    } else{
-                        if (remembers.size() < this.getMemoryCapacity()) { //if rememberMO has capacity to new remembers;
-                            this.createRememberToBiasDecisionFactors(factor);
-                        } else{
-                            LastFactorEntry lastFactorEntry = this.getLastFactor(drivesValuesOrdered, biasFactorsValuesOrdered);
-                            if (!factor.equals(lastFactorEntry.factor)) {
-                                this.removeLastFactor(lastFactorEntry, drivesValuesOrdered, biasFactorsValuesOrdered);
-                                this.createRememberToBiasDecisionFactors(factor);
-                            }
                         }
                     }
+
+                    System.out.println("");
+                    */
+                    this.AffordanceExtractorTimeStamp = this.extractedAffordancesMO.getTimestamp();
                 }
-                */
             }
         }
         
@@ -915,6 +699,4 @@ public class RememberCodelet extends Codelet{
         AuxiliarMethods.synchronize(super.getName());
     }
 
-    
-    
 }

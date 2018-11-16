@@ -317,7 +317,6 @@ public class ReasonerCodelet extends ContainerCodelet{
                     operationInfos.addInputMemoryObject(this.synchronizerMO);
                     operationInfos.addOutputMemoryObject(this.m.createMemoryObject(operationInfos.getClassName()+"_PERCEPTS"));
                     
-                    //outputMOs.add(this.biasDecisionFactorsMO);
                     //inputMOs.add(this.extractedAffordancesMO);
                     
                     operationInfos.addParameter(Map.class, this.activatedAffordance.getPerceptsPermutation());
@@ -464,11 +463,9 @@ public class ReasonerCodelet extends ContainerCodelet{
     public void proc() {
         
         this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
-        
         this.activatedAffordance = (ExtractedAffordance) this.activatedAffordanceMO.getI();
         this.reasonerOperations = (List<Operation>) this.operationsMO.getI();
         this.synchronizers = (ConcurrentHashMap<String, Boolean>) this.synchronizerMO.getI();
-        
         this.reasonerPercepts = (Map<String,Map<Percept,Double>>) this.reasonerMO.getI();
         
         this.toReplacePercepts = new ArrayList<>();
