@@ -344,7 +344,7 @@ public class AttentionCodelet extends Codelet{
             addAttentionPerceptsToWorkingMO();
         }
         
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

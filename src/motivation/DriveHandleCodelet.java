@@ -155,7 +155,7 @@ public class DriveHandleCodelet extends Codelet{
         Statistic.putDrivesActivationInData(this.drives);
         //
         
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

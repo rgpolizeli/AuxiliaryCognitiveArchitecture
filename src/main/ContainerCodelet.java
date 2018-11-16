@@ -120,7 +120,7 @@ public abstract class ContainerCodelet extends Codelet{
             synchronizers.put(codeletName, myLock);
         }
         */
-        AuxiliarMethods.createLock(codelet.getName());
+        AuxiliarMethods.createLock(codelet.getName(),synchronizerMO);
         codelet.start();
     }
     

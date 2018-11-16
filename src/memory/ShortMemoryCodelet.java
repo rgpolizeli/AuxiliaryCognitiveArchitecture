@@ -309,7 +309,7 @@ public class ShortMemoryCodelet extends Codelet{
             this.toModifyPercepts.retainAll(modifiedPercepts);
         }
         
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(),synchronizerMO);
     }
     
 }

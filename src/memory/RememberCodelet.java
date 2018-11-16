@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 import motivation.DecisionFactor;
+import synchronization.MyLock;
 
 /**
  *
@@ -695,8 +696,8 @@ public class RememberCodelet extends Codelet{
         
         removeDeletedPerceptsFromRemembers();
         addRememberPerceptsToWorkingMO();
-            
-        AuxiliarMethods.synchronize(super.getName());
+        
+        AuxiliarMethods.synchronize(super.getName(), this.synchronizerMO);
     }
 
 }

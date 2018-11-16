@@ -11,7 +11,6 @@ import main.MemoriesNames;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 /**
  *
@@ -29,7 +28,6 @@ public class ExecutorHandleCodelet extends Codelet{
     
     private ExtractedAffordance activatedAffordance;
     private Map<String, Codelet> executors;
-    private ConcurrentHashMap<String, Boolean> synchronizers;
     
     public ExecutorHandleCodelet() {
         this.currentAffordance = null;
@@ -77,7 +75,7 @@ public class ExecutorHandleCodelet extends Codelet{
                         this.executorParametersMO.setI(this.activatedAffordance.getPerceptsPermutation());
                         Codelet executor = this.executors.get(this.activatedAffordance.getAffordanceType().getAffordanceName());
                         this.executorHandleMO.setI(Boolean.TRUE); //executor in execution
-                        AuxiliarMethods.createLock(executor.getName());
+                        AuxiliarMethods.createLock(executor.getName(), this.synchronizerMO);
                         executor.setLoop(Boolean.TRUE);
                         executor.start();
 
@@ -92,8 +90,7 @@ public class ExecutorHandleCodelet extends Codelet{
             }
         }
        
-        this.synchronizers = (ConcurrentHashMap) this.synchronizerMO.getI();
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(), this.synchronizerMO);
     }
     
 }

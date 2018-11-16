@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import perception.Property;
 
@@ -48,7 +47,6 @@ public class ReasonerCodelet extends ContainerCodelet{
     private List<Long> reasonerOperationsIds;
     private Map<String,Map<Percept,Double>> reasonerPercepts;
     private List<Percept> toReplacePercepts;
-    private ConcurrentHashMap<String, Boolean> synchronizers;
    
     private Map<ExtractedAffordance, Date> executedOperations;
     
@@ -465,7 +463,6 @@ public class ReasonerCodelet extends ContainerCodelet{
         this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
         this.activatedAffordance = (ExtractedAffordance) this.activatedAffordanceMO.getI();
         this.reasonerOperations = (List<Operation>) this.operationsMO.getI();
-        this.synchronizers = (ConcurrentHashMap<String, Boolean>) this.synchronizerMO.getI();
         this.reasonerPercepts = (Map<String,Map<Percept,Double>>) this.reasonerMO.getI();
         
         this.toReplacePercepts = new ArrayList<>();
@@ -481,7 +478,7 @@ public class ReasonerCodelet extends ContainerCodelet{
         
         addReasonerPerceptsToWorkingMO();
         
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

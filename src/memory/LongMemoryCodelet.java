@@ -331,7 +331,7 @@ public class LongMemoryCodelet extends Codelet{
         
         addRemovedPerceptsToDeleteLongMO();
         
-        AuxiliarMethods.synchronize(super.getName());
+        AuxiliarMethods.synchronize(super.getName(),synchronizerMO);
     }
     
 }
