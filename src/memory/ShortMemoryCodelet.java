@@ -5,7 +5,7 @@
  */
 package memory;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import main.MemoriesNames;
 import actionSelection.Statistic;
 import br.unicamp.cst.core.entities.Codelet;
@@ -15,6 +15,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import main.AuxiliarMethods;
 import perception.Percept;
 import perception.Property;
 import perception.Relation;
@@ -309,7 +310,7 @@ public class ShortMemoryCodelet extends Codelet{
             this.toModifyPercepts.retainAll(modifiedPercepts);
         }
         
-        AuxiliarMethods.synchronize(super.getName(),synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(),synchronizerMO);
     }
     
 }

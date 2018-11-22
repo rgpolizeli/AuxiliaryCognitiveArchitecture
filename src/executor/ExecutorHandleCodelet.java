@@ -5,7 +5,7 @@
  */
 package executor;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import actionSelection.ExtractedAffordance;
 import main.MemoriesNames;
 import br.unicamp.cst.core.entities.Codelet;
@@ -75,7 +75,7 @@ public class ExecutorHandleCodelet extends Codelet{
                         this.executorParametersMO.setI(this.activatedAffordance.getPerceptsPermutation());
                         Codelet executor = this.executors.get(this.activatedAffordance.getAffordanceType().getAffordanceName());
                         this.executorHandleMO.setI(Boolean.TRUE); //executor in execution
-                        AuxiliarMethods.createLock(executor.getName(), this.synchronizerMO);
+                        SynchronizationMethods.createLock(executor.getName(), this.synchronizerMO);
                         executor.setLoop(Boolean.TRUE);
                         executor.start();
 
@@ -90,7 +90,7 @@ public class ExecutorHandleCodelet extends Codelet{
             }
         }
        
-        AuxiliarMethods.synchronize(super.getName(), this.synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(), this.synchronizerMO);
     }
     
 }

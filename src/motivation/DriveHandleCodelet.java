@@ -5,7 +5,7 @@
  */
 package motivation;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import main.MemoriesNames;
 import actionSelection.Statistic;
 import perception.Percept;
@@ -18,6 +18,7 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import main.AuxiliarMethods;
 
 /**
  *
@@ -155,7 +156,7 @@ public class DriveHandleCodelet extends Codelet{
         Statistic.putDrivesActivationInData(this.drives);
         //
         
-        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

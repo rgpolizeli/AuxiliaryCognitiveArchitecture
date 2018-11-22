@@ -6,7 +6,7 @@
 package attention;
 
 import actionSelection.AffordanceType;
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import actionSelection.ConsummatoryAffordanceType;
 import actionSelection.IntermediateAffordanceType;
 import main.MemoriesNames;
@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
+import main.AuxiliarMethods;
 import motivation.Drive;
 
 /**
@@ -344,7 +345,7 @@ public class AttentionCodelet extends Codelet{
             addAttentionPerceptsToWorkingMO();
         }
         
-        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

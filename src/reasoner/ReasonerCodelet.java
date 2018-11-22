@@ -5,7 +5,7 @@
  */
 package reasoner;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import main.ContainerCodelet;
 import actionSelection.ExtractedAffordance;
 import main.MemoriesNames;
@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Random;
 import java.util.concurrent.CopyOnWriteArrayList;
+import main.AuxiliarMethods;
 import perception.Property;
 
 /**
@@ -462,7 +463,7 @@ public class ReasonerCodelet extends ContainerCodelet{
         
         addReasonerPerceptsToWorkingMO();
         
-        AuxiliarMethods.synchronize(super.getName(),this.synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(),this.synchronizerMO);
     }
     
 }

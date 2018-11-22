@@ -7,7 +7,7 @@ package memory;
 
 import motivation.Drive;
 import actionSelection.AffordanceType;
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import actionSelection.ConsummatoryPathInfo;
 import actionSelection.ExtractedAffordance;
 import actionSelection.IntermediateAffordanceType;
@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import main.AuxiliarMethods;
 
 /**
  *
@@ -692,7 +693,7 @@ public class RememberCodelet extends Codelet{
         removeDeletedPerceptsFromRemembers();
         addRememberPerceptsToWorkingMO();
         
-        AuxiliarMethods.synchronize(super.getName(), this.synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(), this.synchronizerMO);
     }
 
 }

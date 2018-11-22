@@ -5,7 +5,7 @@
  */
 package memory;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import main.MemoriesNames;
 import actionSelection.Statistic;
 import perception.Percept;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import main.AuxiliarMethods;
 import perception.Property;
 
 
@@ -303,7 +304,7 @@ public class LongMemoryCodelet extends Codelet{
         Statistic.updateLongMO(countTotalOfPerceptsInMO());
         //
         
-        AuxiliarMethods.synchronize(super.getName(),synchronizerMO);
+        SynchronizationMethods.synchronize(super.getName(),synchronizerMO);
     }
     
 }

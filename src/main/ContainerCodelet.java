@@ -5,7 +5,7 @@
  */
 package main;
 
-import actionSelection.AuxiliarMethods;
+import actionSelection.SynchronizationMethods;
 import perception.Percept;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
@@ -120,7 +120,7 @@ public abstract class ContainerCodelet extends Codelet{
             synchronizers.put(codeletName, myLock);
         }
         */
-        AuxiliarMethods.createLock(codelet.getName(),synchronizerMO);
+        SynchronizationMethods.createLock(codelet.getName(),synchronizerMO);
         codelet.start();
     }
     
@@ -132,7 +132,7 @@ public abstract class ContainerCodelet extends Codelet{
      */
     public void deleteCdt(Codelet codelet, MemoryObject synchronizerMO){
         
-        //if (AuxiliarMethods.destroyLock(codelet.getName()) == 1) {
+        //if (SynchronizationMethods.destroyLock(codelet.getName()) == 1) {
             this.agentMind.getCodeRack().destroyCodelet(codelet);
             //return true;
         //} else{
