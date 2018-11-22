@@ -44,7 +44,6 @@ public class AuxiliaryCognitiveArchitecture {
     private MemoryObject reasonerMO;
     private MemoryObject operationsMO;
     private MemoryObject rememberMO;
-    private MemoryObject toDeleteLongMO;
     private MemoryObject toModifyPerceptionMO;
     private MemoryObject executorHandleMO;
     private MemoryObject executorsMO;
@@ -193,9 +192,6 @@ public class AuxiliaryCognitiveArchitecture {
         
         Map<DecisionFactor, List<Remember>> remembers = new HashMap<>();
         this.rememberMO = m.createMemoryObject(MemoriesNames.REMEMBER_MO, remembers);
-        
-        List<Percept> toDeleteLongMemory = new ArrayList<>();
-        this.toDeleteLongMO = m.createMemoryObject(MemoriesNames.TO_DELETE_LONG_MO, toDeleteLongMemory);
         
         List<Percept> toModifyPerception = new ArrayList<>();
         this.toModifyPerceptionMO = m.createMemoryObject(MemoriesNames.TO_MODIFY_PERCEPTION_MO, toModifyPerception);
@@ -376,13 +372,11 @@ public class AuxiliaryCognitiveArchitecture {
         memorizerCodelet.addInput(this.longMO);
         memorizerCodelet.addInput(this.shortMO);
         memorizerCodelet.addInput(this.reasonerMO);
-        memorizerCodelet.addInput(this.toDeleteLongMO);
         memorizerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         memorizerCodelet.setName("MemorizerCodelet");
         this.m.insertCodelet(memorizerCodelet);
         
         ReasonerCodelet reasonerCodelet = new ReasonerCodelet(this.m, this.operationsMap, this.reasonerMemoryCapacity, this.reasonerMaxActivation, this.reasonerMinActivation, this.reasonerDeleteThreshold, this.reasonerReplaceThreshold, this.reasonerIncrementPerCycle, this.reasonerDecrementPerCycle);
-        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         reasonerCodelet.addInput(this.operationsMO);
         reasonerCodelet.addInput(this.reasonerMO);
         reasonerCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
@@ -398,7 +392,6 @@ public class AuxiliaryCognitiveArchitecture {
         rememberCodelet.addInput(this.reasonerMO);
         rememberCodelet.addInput(this.rememberMO);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.EXTRACTED_AFFORDANCES_MO));
-        rememberCodelet.addInput(this.toDeleteLongMO);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         rememberCodelet.setName("RememberCodelet");
         this.m.insertCodelet(rememberCodelet);

@@ -18,16 +18,15 @@ import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import motivation.DecisionFactor;
-import synchronization.MyLock;
 
 /**
  *
@@ -40,7 +39,6 @@ public class RememberCodelet extends Codelet{
     private MemoryObject rememberMO;
     private MemoryObject workingMO;
     private MemoryObject extractedAffordancesMO;
-    private MemoryObject toDeleteLongMO;
     private MemoryObject synchronizerMO;
     
     private List<ExtractedAffordance> extractedAffordances;
@@ -502,8 +500,6 @@ public class RememberCodelet extends Codelet{
     
     private void removeDeletedPerceptsFromRemembers(){
         
-        List<Percept> toDeletePerceptsFromMemory = new CopyOnWriteArrayList( (List<Percept>) toDeleteLongMO.getI() );
-        
         synchronized(this.rememberMO){
             this.remembers = (Map<DecisionFactor, List<Remember>>) this.rememberMO.getI();
             Map<DecisionFactor, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
@@ -517,49 +513,40 @@ public class RememberCodelet extends Codelet{
                     List<Remember> remembersOfFactor = this.remembers.get(factor);
                     Remember rb = remembersOfFactor.get(i);
                     
-                    Map<String, List<Percept>> rememberedPercepts = rb.getRelevantPercepts();
-                
-                    for (Percept p: toDeletePerceptsFromMemory) {
-                        Map<String,List<String>> relevantPerceptCategoriesMap = rb.getCurrentAff().getRelevantPerceptsCategories();
-                       
-                        Iterator<String> it = relevantPerceptCategoriesMap.keySet().iterator();
-                        boolean finded = false;
-                        String category = null;
+                    Map<String, List<Percept>> rememberedPerceptsMap = rb.getRelevantPercepts();
+                    Map<String, List<Percept>> rememberedPerceptsMapBkp = this.deepCopyRememberRelevantPerceptsMap(rememberedPerceptsMap);
+                    
+                    for (Map.Entry<String, List<Percept>> entry2 : rememberedPerceptsMapBkp.entrySet()) {
                         
-                        while (it.hasNext() && !finded) {
-                            category = it.next();
-                            List<String> relevantPerceptsCategories = relevantPerceptCategoriesMap.get(category);
-                            if (relevantPerceptsCategories!= null && relevantPerceptsCategories.contains(p.getCategory())) {
-                                finded = true;
+                        List<Percept> rememberedPerceptsOfCategory = rememberedPerceptsMap.get(entry2.getKey());
+                        for(Percept p : rememberedPerceptsOfCategory){
+                            Map<Percept,Double> perceptsOfCategoryInLongMOMap = this.memoryPercepts.get(p.getCategory());
+                            if(perceptsOfCategoryInLongMOMap == null || !perceptsOfCategoryInLongMOMap.containsKey(p)){
+                                rememberedPerceptsOfCategory.remove(p);
+                                //System.out.println("Percept " + p.getName() + "removed from RememberMO");
                             }
                         }
                         
-                        if (finded) {
-                            List<Percept> rememberedPerceptsOfCategory = rememberedPercepts.get(category); //the category of percept is in rememberedPercepts? 
+                        if (rememberedPerceptsOfCategory.isEmpty()) { //if list of this percept type was empty, delete it 
+                            rememberedPerceptsMap.remove(entry2.getKey());
+                            // e os notRemember?
+                            if (rememberedPerceptsMap.isEmpty()) { //if map was empty, delete it
+                                remembersOfFactor.remove(rb);
 
-                            if (rememberedPerceptsOfCategory != null && rememberedPerceptsOfCategory.contains(p)) {
-                                rememberedPerceptsOfCategory.remove(p);
-                                //System.out.println("Percept " + p.getName() + "removed from RememberMO");
-                                if (rememberedPerceptsOfCategory.isEmpty()) { //if list of this percept type was empty, delete it
-                                    rememberedPercepts.remove(p.getCategory());
-                                    if (rememberedPercepts.isEmpty()) { //if map was empty, delete it
-                                        this.remembers.remove(entry.getKey());
-                                    }
+                                if(remembersOfFactor.isEmpty()){
+                                    this.remembers.remove(factor);
                                 }
-                            }  
+                            }
                         }
-                        
                     }
+                    
                 }
-                
                 
             }
             
             this.rememberMO.setI(this.remembers);
             
         }
-        
-        this.toDeleteLongMO.setI(new ArrayList<>());
     
     }
     
@@ -613,6 +600,16 @@ public class RememberCodelet extends Codelet{
         }
     }
     
+    public Map<String, List<Percept>> deepCopyRememberRelevantPerceptsMap(Map<String, List<Percept>> relevantPerceptsMap){
+        
+        Map<String, List<Percept>> relevantPerceptsMapBkp = new HashMap<>();
+        for(Map.Entry<String, List<Percept>> entry : relevantPerceptsMap.entrySet()){
+            relevantPerceptsMapBkp.put( entry.getKey(),new ArrayList<>(entry.getValue()) );
+        }
+        return relevantPerceptsMapBkp;
+        
+    }
+    
     //////////////////////
     // OVERRIDE METHODS //
     //////////////////////
@@ -624,7 +621,6 @@ public class RememberCodelet extends Codelet{
         this.rememberMO = (MemoryObject) this.getInput(MemoriesNames.REMEMBER_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
         this.extractedAffordancesMO = (MemoryObject) this.getInput(MemoriesNames.EXTRACTED_AFFORDANCES_MO);
-        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoriesNames.TO_DELETE_LONG_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
@@ -661,7 +657,7 @@ public class RememberCodelet extends Codelet{
                 
                 decrementNotRemembers();
                 decrementRemembers();
-                        
+                
                 synchronized(this.rememberMO){ //necessary to synchronize with affordanceExtractorCodelet
                     for (Entry<Drive,Double> entry : drivesValuesOrdered) {
 

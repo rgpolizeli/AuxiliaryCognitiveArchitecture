@@ -33,17 +33,16 @@ public class ReasonerCodelet extends ContainerCodelet{
 
     private final Mind m;
     
-    private MemoryObject driveMO;
-    private MemoryObject operationsMO;
+    private MemoryObject instancedOperationsMO;
     private MemoryObject reasonerMO;
     private MemoryObject workingMO;
     private MemoryObject activatedAffordanceMO;
     private MemoryObject synchronizerMO;
     
-    private List<Drive> drives;
+    
     private Map<String, ExecutorInfo> operationsMap; //this parameter associate the affordanceType that invoke this operation
     private ExtractedAffordance activatedAffordance;
-    private List<Operation> reasonerOperations;
+    private List<Operation> instancedOperations;
     private List<Long> reasonerOperationsIds;
     private Map<String,Map<Percept,Double>> reasonerPercepts;
     private List<Percept> toReplacePercepts;
@@ -259,7 +258,7 @@ public class ReasonerCodelet extends ContainerCodelet{
     
     
     private void putOperationsPerceptsInReasonerMO(){
-        for (Operation op : this.reasonerOperations) {
+        for (Operation op : this.instancedOperations) {
             
             if (op.getStatus() == this.DONE) { //if operation already had done.
                 Codelet cdt = op.getCdt();
@@ -311,7 +310,7 @@ public class ReasonerCodelet extends ContainerCodelet{
                 //if (!this.executedOperations.containsKey(this.activatedAffordance)) {
                           
                     ExecutorInfo operationInfos = this.operationsMap.get(this.activatedAffordance.getAffordanceType().getAffordanceName()).getClone();
-                    operationInfos.addInputMemoryObject(this.operationsMO);
+                    operationInfos.addInputMemoryObject(this.instancedOperationsMO);
                     operationInfos.addInputMemoryObject(this.synchronizerMO);
                     operationInfos.addOutputMemoryObject(this.m.createMemoryObject(operationInfos.getClassName()+"_PERCEPTS"));
                     
@@ -320,9 +319,9 @@ public class ReasonerCodelet extends ContainerCodelet{
                     operationInfos.addParameter(Map.class, this.activatedAffordance.getPerceptsPermutation());
 
                     Codelet cdt = super.createCdt(this.getOperationID(), operationInfos.getClassName(), operationInfos.getParametersClasses(), operationInfos.getParametersObjects(), operationInfos.getMemoryObjectsInput(), operationInfos.getMemoryObjectsOutput());
-                    newOperation = new Operation(this.activatedAffordance.getDrives(),(ExtractedAffordance)this.activatedAffordance.getClone(), cdt, this.STARTED);
-                    this.reasonerOperations.add( newOperation );
-                    this.operationsMO.setI(this.reasonerOperations);
+                    newOperation = new Operation((ExtractedAffordance)this.activatedAffordance.getClone(), cdt, this.STARTED);
+                    this.instancedOperations.add( newOperation );
+                    this.instancedOperationsMO.setI(this.instancedOperations);
                 //}
                 //else{
                     //this.activatedAffordance = null;
@@ -338,39 +337,26 @@ public class ReasonerCodelet extends ContainerCodelet{
     }
      
     private void destroyReasonerOperations(){
-        
-        //synchronized(this.operationsMO){
-            List<Operation> ops = new ArrayList<>();
-            ops.addAll(this.reasonerOperations);
+        List<Operation> ops = new ArrayList<>();
+        ops.addAll(this.instancedOperations);
 
-            for (Operation op: ops){
-                List<Drive> factors = op.getDrives();
-                int status = op.getStatus();
+        for (Operation op: ops){
+            int status = op.getStatus();
 
-                if ( (!this.drives.containsAll(factors)) || (status == this.COMMITED) ) { //if factor were deleted or if codelet has terminated and producted percepts had read.
-
-                    //if (super.deleteCdt(op.getCdt(), this.synchronizerMO)) { //if success in delete
-                        //synchronized(this.operationsMO){
-                            this.removeOperationMO(op.getCdt());
-                            super.deleteCdt(op.getCdt(),this.synchronizerMO);
-                            if (op.getAff().equals(this.activatedAffordance)) {
-                                this.activatedAffordance = null;
-                                this.activatedAffordanceMO.setI(this.activatedAffordance);
-                            }
-
-                            this.insertExecutedOperation(op.getAff());
-
-                            this.reasonerOperations.remove(op);
-                            this.operationsMO.setI(this.reasonerOperations);
-
-                            //removeReasonerPercepts(op);
-                        //}
-                    //}
-                    
+            if (status == this.COMMITED) { //if codelet has terminated and producted percepts had read.
+                this.removeOperationMO(op.getCdt());
+                super.deleteCdt(op.getCdt(),this.synchronizerMO);
+                if (op.getAff().equals(this.activatedAffordance)) {
+                    this.activatedAffordance = null;
+                    this.activatedAffordanceMO.setI(this.activatedAffordance);
                 }
+
+                this.insertExecutedOperation(op.getAff());
+
+                this.instancedOperations.remove(op);
+                this.instancedOperationsMO.setI(this.instancedOperations);
             }
-        //}
-        
+        }
     }
     
     private void removeOperationMO(Codelet operationCodelet){
@@ -445,8 +431,7 @@ public class ReasonerCodelet extends ContainerCodelet{
     
     @Override
     public void accessMemoryObjects() {
-        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
-        this.operationsMO = (MemoryObject) this.getInput(MemoriesNames.OPERATIONS_MO);
+        this.instancedOperationsMO = (MemoryObject) this.getInput(MemoriesNames.OPERATIONS_MO);
         this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
         this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoriesNames.ACTIVATED_AFFORDANCE_MO);
@@ -460,9 +445,8 @@ public class ReasonerCodelet extends ContainerCodelet{
     @Override
     public void proc() {
         
-        this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
         this.activatedAffordance = (ExtractedAffordance) this.activatedAffordanceMO.getI();
-        this.reasonerOperations = (List<Operation>) this.operationsMO.getI();
+        this.instancedOperations = (List<Operation>) this.instancedOperationsMO.getI();
         this.reasonerPercepts = (Map<String,Map<Percept,Double>>) this.reasonerMO.getI();
         
         this.toReplacePercepts = new ArrayList<>();
@@ -473,7 +457,7 @@ public class ReasonerCodelet extends ContainerCodelet{
         
         this.destroyReasonerOperations();
         this.createReasonerOperation();
-    
+        
         //System.out.println("ReasonerMO: " + this.reasonerPercepts.size() + " Total: "  + this.reasonerMOCapacity);
         
         addReasonerPerceptsToWorkingMO();

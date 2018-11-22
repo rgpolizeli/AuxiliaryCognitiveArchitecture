@@ -16,13 +16,11 @@ import java.util.List;
  */
 public class Operation {
 
-    private List<Drive> drives;
     private ExtractedAffordance aff;
     private Codelet cdt;
     private int status;
     
-    public Operation(List<Drive> drives, ExtractedAffordance aff, Codelet cdt, int status) {
-        this.drives = drives;
+    public Operation(ExtractedAffordance aff, Codelet cdt, int status) {
         this.aff = aff;
         this.cdt = cdt;
         this.status = status;
@@ -31,10 +29,6 @@ public class Operation {
     //////////////////////
     // AUXILIARY METHODS //
     //////////////////////
-    
-    public List<Drive> getDrives(){
-        return this.drives;
-    }
     
     public ExtractedAffordance getAff() {
         return aff;
@@ -48,10 +42,6 @@ public class Operation {
         return status;
     }
 
-    public void setDrives(List<Drive> factors){
-        this.drives = factors;
-    }
-    
     public void setAff(ExtractedAffordance aff) {
         this.aff = aff;
     }

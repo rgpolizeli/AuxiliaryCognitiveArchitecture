@@ -29,14 +29,11 @@ public class LongMemoryCodelet extends Codelet{
     private MemoryObject longMO;
     private MemoryObject shortMO;
     private MemoryObject reasonerMO;
-    private MemoryObject toDeleteLongMO;
     private MemoryObject synchronizerMO;
     
     private Map<String, Map<Percept, Double>> longPercepts;
     private Map<String, Map<Percept, Double>> shortPercepts;
     private Map<String, Map<Percept, Double>> reasonerPercepts;
-    private List<Percept> toDeleteLongMemory;
-    private List<Percept> toDeletePercepts;
     private List<Percept> toReplacePercepts;
     
     private int longMemoryCapacity = 80;
@@ -180,7 +177,6 @@ public class LongMemoryCodelet extends Codelet{
                 memoryPerceptsOfCategory = memoryPercepts.get(p.getCategory());
                 if (memoryPerceptsOfCategory.containsKey(p)) {
                     memoryPerceptsOfCategory.remove(p);
-                    this.toDeletePercepts.add(p);
                     if (memoryPerceptsOfCategory.isEmpty()) {
                         memoryPercepts.remove(p.getCategory());
                     }
@@ -256,26 +252,6 @@ public class LongMemoryCodelet extends Codelet{
 
     }
     
-    private void addRemovedPerceptsToDeleteLongMO(){
-        if (!this.toDeletePercepts.isEmpty()) {
-            
-            synchronized(this.toDeleteLongMO){
-                this.toDeleteLongMemory = (List<Percept>) this.toDeleteLongMO.getI();
-                        
-                if (this.toDeleteLongMemory == null) {
-                    this.toDeleteLongMemory = new ArrayList<>(this.toDeletePercepts);
-                    this.toDeleteLongMO.setI(this.toDeleteLongMemory);
-                } else{
-                    for(Percept p : this.toDeletePercepts){
-                        if(!this.toDeleteLongMemory.contains(p)){
-                            this.toDeleteLongMemory.add(p);
-                        }
-                    }
-                }
-            }
-        }
-    }
-    
     //////////////////////
     // OVERRIDE METHODS //
     //////////////////////
@@ -285,7 +261,6 @@ public class LongMemoryCodelet extends Codelet{
         this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
         this.shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
         this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
-        this.toDeleteLongMO = (MemoryObject) this.getInput(MemoriesNames.TO_DELETE_LONG_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 
@@ -308,7 +283,6 @@ public class LongMemoryCodelet extends Codelet{
             this.reasonerPercepts = AuxiliarMethods.deepCopyMemoryMap(this.reasonerPercepts);
         }
         
-        this.toDeletePercepts = new ArrayList<>();
         this.toReplacePercepts = new ArrayList<>();
         
         this.decrementPerceptsActivations(this.longMO);//decrement and create the todeleteList and toReplaceList
@@ -328,8 +302,6 @@ public class LongMemoryCodelet extends Codelet{
         //COLLECT METHODS
         Statistic.updateLongMO(countTotalOfPerceptsInMO());
         //
-        
-        addRemovedPerceptsToDeleteLongMO();
         
         AuxiliarMethods.synchronize(super.getName(),synchronizerMO);
     }
