@@ -25,7 +25,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import motivation.DecisionFactor;
 import motivation.Drive;
 import motivation.DriveHandleCodelet;
 
@@ -190,7 +189,7 @@ public class AuxiliaryCognitiveArchitecture {
         List<Operation> reasonerOperations = new ArrayList<>();
         this.operationsMO = m.createMemoryObject(MemoriesNames.OPERATIONS_MO, reasonerOperations);
         
-        Map<DecisionFactor, List<Remember>> remembers = new HashMap<>();
+        Map<Drive, List<Remember>> remembers = new HashMap<>();
         this.rememberMO = m.createMemoryObject(MemoriesNames.REMEMBER_MO, remembers);
         
         List<Percept> toModifyPerception = new ArrayList<>();

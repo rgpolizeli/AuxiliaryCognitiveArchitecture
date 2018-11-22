@@ -26,7 +26,6 @@ import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
-import motivation.DecisionFactor;
 
 /**
  *
@@ -45,7 +44,7 @@ public class RememberCodelet extends Codelet{
     private Map<String,List<Percept>> attentionPercepts;
     private Map<String,Map<Percept,Double>> memoryPercepts;
     private List<Drive> drives;
-    private Map<DecisionFactor, List<Remember>> remembers;
+    private Map<Drive, List<Remember>> remembers;
     private final Map<String, Integer> notRemembers; //(String = drive name + affordance parent name + affordance name)
     private Map<Drive, Double> drivesActivations;
     
@@ -205,11 +204,11 @@ public class RememberCodelet extends Codelet{
     
     private void decrementRemembers(){
         synchronized(this.rememberMO){
-            Map<DecisionFactor, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
+            Map<Drive, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
             
-            for (Map.Entry<DecisionFactor, List<Remember>> entry : remembersBkp.entrySet()) {
+            for (Map.Entry<Drive, List<Remember>> entry : remembersBkp.entrySet()) {
                 
-                DecisionFactor factor = entry.getKey();
+                Drive factor = entry.getKey();
                 List<Remember> remembersOfFactorBkp = entry.getValue();
                 
                 List<Remember> remembersOfFactor = this.remembers.get(factor);
@@ -501,12 +500,12 @@ public class RememberCodelet extends Codelet{
     private void removeDeletedPerceptsFromRemembers(){
         
         synchronized(this.rememberMO){
-            this.remembers = (Map<DecisionFactor, List<Remember>>) this.rememberMO.getI();
-            Map<DecisionFactor, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
+            this.remembers = (Map<Drive, List<Remember>>) this.rememberMO.getI();
+            Map<Drive, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
             
-            for (Map.Entry<DecisionFactor, List<Remember>> entry : remembersBkp.entrySet()) {
+            for (Map.Entry<Drive, List<Remember>> entry : remembersBkp.entrySet()) {
                 
-                DecisionFactor factor = entry.getKey();
+                Drive factor = entry.getKey();
                 List<Remember> remembersOfFactorBkp = entry.getValue();
                 
                 for (int i = 0; i < remembersOfFactorBkp.size(); i++) {
@@ -590,10 +589,10 @@ public class RememberCodelet extends Codelet{
         }
     }
     
-    public Map<DecisionFactor, List<Remember>> deepCopyRememberMap(Map<DecisionFactor, List<Remember>> remembers){
+    public Map<Drive, List<Remember>> deepCopyRememberMap(Map<Drive, List<Remember>> remembers){
         synchronized(remembers){
-            Map<DecisionFactor, List<Remember>> remembersBkp = new HashMap<>();
-            for(Map.Entry<DecisionFactor, List<Remember>> entry : remembers.entrySet()){
+            Map<Drive, List<Remember>> remembersBkp = new HashMap<>();
+            for(Map.Entry<Drive, List<Remember>> entry : remembers.entrySet()){
                 remembersBkp.put( entry.getKey(),new ArrayList<>(entry.getValue()) );
             }
             return remembersBkp;
@@ -646,7 +645,7 @@ public class RememberCodelet extends Codelet{
         
             this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
 
-            this.remembers = (Map<DecisionFactor, List<Remember>>) this.rememberMO.getI(); //don´t necessary save a actual version of this MO;
+            this.remembers = (Map<Drive, List<Remember>>) this.rememberMO.getI(); //don´t necessary save a actual version of this MO;
             
             if (this.remembers.isEmpty() || (!this.remembers.isEmpty() && (this.AffordanceExtractorTimeStamp == -Long.MIN_VALUE || this.extractedAffordancesMO.getTimestamp() > this.AffordanceExtractorTimeStamp)) ){ //all remembers were read.
                
