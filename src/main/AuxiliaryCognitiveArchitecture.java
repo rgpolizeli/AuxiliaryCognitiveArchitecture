@@ -355,6 +355,7 @@ public class AuxiliaryCognitiveArchitecture {
         attentionCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         attentionCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         attentionCodelet.setName("AttentionCodelet");
+        attentionCodelet.setTimeStep(0);
         this.m.insertCodelet(attentionCodelet);
         
         ExecutorHandleCodelet executorHandleCodelet = new ExecutorHandleCodelet();
@@ -365,6 +366,7 @@ public class AuxiliaryCognitiveArchitecture {
         
         executorHandleCodelet.addOutput(this.executorParametersMO);
         executorHandleCodelet.setName("ExecutorHandleCodelet");
+        executorHandleCodelet.setTimeStep(0);
         this.m.insertCodelet(executorHandleCodelet);
         
         LongMemoryCodelet memorizerCodelet = new LongMemoryCodelet(this.longMemoryCapacity, this.memorizerIncrementPerCycle, this.memorizerDecrementPerCycle, this.memorizerMaxActivation, this.memorizerMinActivation, this.memorizerThreshold, this.memorizerDeleteThreshold, this.memorizerReplaceThreshold);
@@ -373,6 +375,7 @@ public class AuxiliaryCognitiveArchitecture {
         memorizerCodelet.addInput(this.reasonerMO);
         memorizerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         memorizerCodelet.setName("MemorizerCodelet");
+        memorizerCodelet.setTimeStep(0);
         this.m.insertCodelet(memorizerCodelet);
         
         ReasonerCodelet reasonerCodelet = new ReasonerCodelet(this.m, this.operationsMap, this.reasonerMemoryCapacity, this.reasonerMaxActivation, this.reasonerMinActivation, this.reasonerDeleteThreshold, this.reasonerReplaceThreshold, this.reasonerIncrementPerCycle, this.reasonerDecrementPerCycle);
@@ -382,6 +385,7 @@ public class AuxiliaryCognitiveArchitecture {
         reasonerCodelet.addInput(getMemoryByName(MemoriesNames.ACTIVATED_AFFORDANCE_MO));
         reasonerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         reasonerCodelet.setName("ReasonerCodelet");
+        reasonerCodelet.setTimeStep(0);
         this.m.insertCodelet(reasonerCodelet);
         
         RememberCodelet rememberCodelet = new RememberCodelet(this.rememberCapacity, 15, this.rememberDuration, this.rememberDecrement, this.rememberForgetThreshold);
@@ -393,6 +397,7 @@ public class AuxiliaryCognitiveArchitecture {
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.EXTRACTED_AFFORDANCES_MO));
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         rememberCodelet.setName("RememberCodelet");
+        rememberCodelet.setTimeStep(0);
         this.m.insertCodelet(rememberCodelet);
         
         ShortMemoryCodelet shortMemoryCodelet = new ShortMemoryCodelet(this.shortMemoryCapacity, this.perceptionMaxActivation, this.perceptionMinActivation, this.perceptionDeleteThreshold, this.perceptionReplaceThreshold, this.perceptionIncrementPerCycle, this.perceptionDecrementPerCycle);
@@ -402,6 +407,7 @@ public class AuxiliaryCognitiveArchitecture {
         shortMemoryCodelet.addInput(this.toModifyPerceptionMO);
         shortMemoryCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         shortMemoryCodelet.setName("ShortMemoryCodelet");
+        shortMemoryCodelet.setTimeStep(0);
         this.m.insertCodelet(shortMemoryCodelet);
         
         DriveHandleCodelet driveHandleCdt = new DriveHandleCodelet(this.selfPerceptCategory, this.relevantPerceptsIncrement);
@@ -409,6 +415,7 @@ public class AuxiliaryCognitiveArchitecture {
         driveHandleCdt.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         driveHandleCdt.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
         driveHandleCdt.setName("DriveHandleCodelet");
+        driveHandleCdt.setTimeStep(0);
         this.m.insertCodelet(driveHandleCdt);
         
         this.asbac.createCodelets();

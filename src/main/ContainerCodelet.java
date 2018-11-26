@@ -60,6 +60,7 @@ public abstract class ContainerCodelet extends Codelet{
                  cdt.addOutput(mo);
             }
             
+            cdt.setTimeStep(0);
             this.agentMind.insertCodelet(cdt);
             cdt.start();
             
@@ -100,6 +101,7 @@ public abstract class ContainerCodelet extends Codelet{
             }
             cdt.setName(className + id);
             cdt.setLoop(Boolean.FALSE);
+            cdt.setTimeStep(0);
             this.agentMind.insertCodelet(cdt);
             
         } catch (ClassNotFoundException | NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {

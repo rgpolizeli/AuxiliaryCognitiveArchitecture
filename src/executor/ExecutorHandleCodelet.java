@@ -77,6 +77,7 @@ public class ExecutorHandleCodelet extends Codelet{
                         this.executorHandleMO.setI(Boolean.TRUE); //executor in execution
                         SynchronizationMethods.createLock(executor.getName(), this.synchronizerMO);
                         executor.setLoop(Boolean.TRUE);
+                        executor.setTimeStep(0);
                         executor.start();
 
                         this.currentAffordance = this.activatedAffordance;
