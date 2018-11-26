@@ -519,7 +519,7 @@ public class RememberCodelet extends Codelet{
                     for (Map.Entry<String, List<Percept>> entry2 : rememberedPerceptsMapBkp.entrySet()) {
                         
                         List<Percept> rememberedPerceptsOfCategory = rememberedPerceptsMap.get(entry2.getKey());
-                        for(Percept p : rememberedPerceptsOfCategory){
+                        for(Percept p : new ArrayList<>(rememberedPerceptsOfCategory)){
                             Map<Percept,Double> perceptsOfCategoryInLongMOMap = this.memoryPercepts.get(p.getCategory());
                             if(perceptsOfCategoryInLongMOMap == null || !perceptsOfCategoryInLongMOMap.containsKey(p)){
                                 rememberedPerceptsOfCategory.remove(p);
