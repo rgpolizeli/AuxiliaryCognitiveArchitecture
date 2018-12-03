@@ -7,16 +7,11 @@ package main;
 
 import actionSelection.ActionSelectionMechanism;
 import attention.AttentionCodelet;
-import reasoner.ReasonerCodelet;
-import reasoner.Operation;
-import executor.ExecutorInfo;
 import executor.ExecutorHandleCodelet;
-import memory.LongMemoryCodelet;
 import memory.Remember;
 import memory.RememberCodelet;
 import perception.Percept;
 import perception.Property;
-import memory.ShortMemoryCodelet;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.Memory;
 import br.unicamp.cst.core.entities.MemoryObject;
@@ -25,12 +20,15 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import memory.MemoryCodelet;
 import motivation.Drive;
 import motivation.DriveHandleCodelet;
 
 /**
  *
- * @author ricardo
+ * @author rgpolizeli
  */
 public class AuxiliaryCognitiveArchitecture {
     
@@ -41,7 +39,7 @@ public class AuxiliaryCognitiveArchitecture {
     private MemoryObject shortMO;
     private MemoryObject longMO;
     private MemoryObject reasonerMO;
-    private MemoryObject operationsMO;
+    private MemoryObject createdPerceptsMO;
     private MemoryObject rememberMO;
     private MemoryObject toModifyPerceptionMO;
     private MemoryObject executorHandleMO;
@@ -62,12 +60,12 @@ public class AuxiliaryCognitiveArchitecture {
     private Map<String, String> actuators;
     
     private double memorizerThreshold = -1.0; 
-    private double memorizerMaxActivation = -1.0;
-    private double memorizerMinActivation = -1.0;
-    private double memorizerDeleteThreshold = -1.0;
-    private double memorizerReplaceThreshold = -1.0;
-    private double memorizerIncrementPerCycle = -1.0;
-    private double memorizerDecrementPerCycle = -1.0;
+    private double longMemoryMaxActivation = -1.0;
+    private double longMemoryMinActivation = -1.0;
+    private double longMemoryDeleteThreshold = -1.0;
+    private double longMemoryReplaceThreshold = -1.0;
+    private double longMemoryIncrementPerCycle = -1.0;
+    private double longMemoryDecrementPerCycle = -1.0;
     
     private double reasonerMaxActivation = -1.0;
     private double reasonerMinActivation = -1.0;
@@ -75,18 +73,17 @@ public class AuxiliaryCognitiveArchitecture {
     private double reasonerReplaceThreshold = -1.0; 
     private double reasonerIncrementPerCycle = -1.0;
     private double reasonerDecrementPerCycle = -1.0;
-    private Map<String, ExecutorInfo> operationsMap;
     
     private int rememberForgetThreshold = -1;
     private int rememberDuration = -1;
     private int rememberDecrement = -1;
     
-    private double perceptionMaxActivation = -1.0;
-    private double perceptionMinActivation = -1.0;
-    private double perceptionDeleteThreshold = -1.0;
-    private double perceptionReplaceThreshold = -1.0; 
-    private double perceptionIncrementPerCycle = -1.0;
-    private double perceptionDecrementPerCycle = -1.0;
+    private double shortMemoryMaxActivation = -1.0;
+    private double shortMemoryMinActivation = -1.0;
+    private double shortMemoryDeleteThreshold = -1.0;
+    private double shortMemoryReplaceThreshold = -1.0; 
+    private double shortMemoryIncrementPerCycle = -1.0;
+    private double shortMemoryDecrementPerCycle = -1.0;
     
     private String selfPerceptCategory;
     private double relevantPerceptsIncrement = -1.0;
@@ -139,16 +136,15 @@ public class AuxiliaryCognitiveArchitecture {
     
     public void setLongMemoryParameters(double memorizerThreshold, double maxActivation, double minActivation, double deleteThreshold, double replaceThreshold, double incrementPerCycle, double decrementPerCycle){
         this.memorizerThreshold = memorizerThreshold;
-        this.memorizerMaxActivation = maxActivation;
-        this.memorizerMinActivation = minActivation;
-        this.memorizerDeleteThreshold = deleteThreshold;
-        this.memorizerReplaceThreshold = replaceThreshold;
-        this.memorizerIncrementPerCycle = incrementPerCycle;
-        this.memorizerDecrementPerCycle = decrementPerCycle;
+        this.longMemoryMaxActivation = maxActivation;
+        this.longMemoryMinActivation = minActivation;
+        this.longMemoryDeleteThreshold = deleteThreshold;
+        this.longMemoryReplaceThreshold = replaceThreshold;
+        this.longMemoryIncrementPerCycle = incrementPerCycle;
+        this.longMemoryDecrementPerCycle = decrementPerCycle;
     }
     
-    public void setReasonerParameters(Map<String, ExecutorInfo> operationsMap, double maxActivation, double minActivation, double deleteThreshold, double replaceThreshold, double incrementPerCycle, double decrementPerCycle){
-        this.operationsMap = operationsMap;
+    public void setReasonerParameters(double maxActivation, double minActivation, double deleteThreshold, double replaceThreshold, double incrementPerCycle, double decrementPerCycle){
         this.reasonerMaxActivation = maxActivation;
         this.reasonerMinActivation = minActivation;
         this.reasonerDeleteThreshold = deleteThreshold;
@@ -157,7 +153,6 @@ public class AuxiliaryCognitiveArchitecture {
         this.reasonerDecrementPerCycle = decrementPerCycle;
     }
     
-    
     public void setRememberParameters(int rememberDuration, int rememberDecrement, int rememberForgetThreshold){
         this.rememberDuration = rememberDuration;
         this.rememberDecrement = rememberDecrement;
@@ -165,12 +160,12 @@ public class AuxiliaryCognitiveArchitecture {
     }
     
     public void setShortMemoryParameters(double maxActivation, double minActivation, double deleteThreshold, double replaceThreshold, double incrementPerCycle, double decrementPerCycle){
-        this.perceptionMaxActivation = maxActivation;
-        this.perceptionMinActivation = minActivation;
-        this.perceptionDeleteThreshold = deleteThreshold;
-        this.perceptionReplaceThreshold = replaceThreshold;
-        this.perceptionIncrementPerCycle = incrementPerCycle;
-        this.perceptionDecrementPerCycle = decrementPerCycle;
+        this.shortMemoryMaxActivation = maxActivation;
+        this.shortMemoryMinActivation = minActivation;
+        this.shortMemoryDeleteThreshold = deleteThreshold;
+        this.shortMemoryReplaceThreshold = replaceThreshold;
+        this.shortMemoryIncrementPerCycle = incrementPerCycle;
+        this.shortMemoryDecrementPerCycle = decrementPerCycle;
     }
     
     public void createCognitiveArchitectureMOs(){
@@ -183,11 +178,11 @@ public class AuxiliaryCognitiveArchitecture {
         Map<String, Map<Percept, Double>> longMemoryMap = new HashMap();
         this.longMO = m.createMemoryObject(MemoriesNames.LONG_MO, longMemoryMap);
         
-        Map<Operation, List<Percept>> reasonerPercepts = new HashMap<>();
-        this.reasonerMO = m.createMemoryObject(MemoriesNames.REASONER_MO, reasonerPercepts);
+        Map<String, List<Percept>> createdPercepts = new HashMap<>();
+        this.createdPerceptsMO = m.createMemoryObject(MemoriesNames.CREATED_PERCEPTS_MO, createdPercepts);
         
-        List<Operation> reasonerOperations = new ArrayList<>();
-        this.operationsMO = m.createMemoryObject(MemoriesNames.OPERATIONS_MO, reasonerOperations);
+        Map<String,Map<Percept,Double>> reasonerPercepts = new HashMap<>();
+        this.reasonerMO = m.createMemoryObject(MemoriesNames.REASONER_MO, reasonerPercepts);
         
         Map<Drive, List<Remember>> remembers = new HashMap<>();
         this.rememberMO = m.createMemoryObject(MemoriesNames.REMEMBER_MO, remembers);
@@ -243,27 +238,27 @@ public class AuxiliaryCognitiveArchitecture {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerMaxActivation == -1.0) {
+        if (this.longMemoryMaxActivation == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerMinActivation == -1.0) {
+        if (this.longMemoryMinActivation == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerDeleteThreshold == -1.0) {
+        if (this.longMemoryDeleteThreshold == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerReplaceThreshold == -1.0) {
+        if (this.longMemoryReplaceThreshold == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerIncrementPerCycle == -1.0) {
+        if (this.longMemoryIncrementPerCycle == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.memorizerDecrementPerCycle == -1.0) {
+        if (this.longMemoryDecrementPerCycle == -1.0) {
             throw new IllegalArgumentException();
         }
         
@@ -292,10 +287,6 @@ public class AuxiliaryCognitiveArchitecture {
             throw new IllegalArgumentException();
         }
     
-        if (this.operationsMap == null) {
-            throw new IllegalArgumentException();
-        }
-    
         if (this.rememberForgetThreshold == -1) {
             throw new IllegalArgumentException();
         }
@@ -308,27 +299,27 @@ public class AuxiliaryCognitiveArchitecture {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionMaxActivation == -1.0) {
+        if (this.shortMemoryMaxActivation == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionMinActivation == -1.0) {
+        if (this.shortMemoryMinActivation == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionDeleteThreshold == -1.0) {
+        if (this.shortMemoryDeleteThreshold == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionReplaceThreshold == -1.0) {
+        if (this.shortMemoryReplaceThreshold == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionIncrementPerCycle == -1.0) {
+        if (this.shortMemoryIncrementPerCycle == -1.0) {
             throw new IllegalArgumentException();
         }
         
-        if (this.perceptionDecrementPerCycle == -1.0) {
+        if (this.shortMemoryDecrementPerCycle == -1.0) {
             throw new IllegalArgumentException();
         }
         
@@ -361,6 +352,8 @@ public class AuxiliaryCognitiveArchitecture {
         ExecutorHandleCodelet executorHandleCodelet = new ExecutorHandleCodelet();
         executorHandleCodelet.addInput(this.executorsMO);
         executorHandleCodelet.addInput(this.executorHandleMO);
+        executorHandleCodelet.addInput(this.reasonerMO);
+        executorHandleCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
         executorHandleCodelet.addInput(getMemoryByName(MemoriesNames.ACTIVATED_AFFORDANCE_MO));
         executorHandleCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         
@@ -369,25 +362,23 @@ public class AuxiliaryCognitiveArchitecture {
         executorHandleCodelet.setTimeStep(0);
         this.m.insertCodelet(executorHandleCodelet);
         
-        LongMemoryCodelet memorizerCodelet = new LongMemoryCodelet(this.longMemoryCapacity, this.memorizerIncrementPerCycle, this.memorizerDecrementPerCycle, this.memorizerMaxActivation, this.memorizerMinActivation, this.memorizerThreshold, this.memorizerDeleteThreshold, this.memorizerReplaceThreshold);
-        memorizerCodelet.addInput(this.longMO);
-        memorizerCodelet.addInput(this.shortMO);
-        memorizerCodelet.addInput(this.reasonerMO);
-        memorizerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
-        memorizerCodelet.setName("MemorizerCodelet");
-        memorizerCodelet.setTimeStep(0);
-        this.m.insertCodelet(memorizerCodelet);
-        
-        ReasonerCodelet reasonerCodelet = new ReasonerCodelet(this.m, this.operationsMap, this.reasonerMemoryCapacity, this.reasonerMaxActivation, this.reasonerMinActivation, this.reasonerDeleteThreshold, this.reasonerReplaceThreshold, this.reasonerIncrementPerCycle, this.reasonerDecrementPerCycle);
-        reasonerCodelet.addInput(this.operationsMO);
-        reasonerCodelet.addInput(this.reasonerMO);
-        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
-        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.ACTIVATED_AFFORDANCE_MO));
-        reasonerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
-        reasonerCodelet.setName("ReasonerCodelet");
-        reasonerCodelet.setTimeStep(0);
-        this.m.insertCodelet(reasonerCodelet);
-        
+        MemoryCodelet memoryCodelet = new MemoryCodelet(longMemoryMaxActivation,longMemoryMinActivation,
+                shortMemoryCapacity, shortMemoryDeleteThreshold, shortMemoryReplaceThreshold, shortMemoryIncrementPerCycle, shortMemoryDecrementPerCycle, 
+                longMemoryCapacity, memorizerThreshold, longMemoryDeleteThreshold, longMemoryReplaceThreshold, longMemoryIncrementPerCycle, longMemoryDecrementPerCycle, 
+                reasonerMemoryCapacity, reasonerDeleteThreshold, reasonerReplaceThreshold, reasonerIncrementPerCycle, reasonerDecrementPerCycle
+        );
+        memoryCodelet.addInput(this.perceptionMO);
+        memoryCodelet.addInput(this.shortMO);
+        memoryCodelet.addInput(this.longMO);
+        memoryCodelet.addInput(this.reasonerMO);
+        memoryCodelet.addInput(this.createdPerceptsMO);
+        memoryCodelet.addInput(this.toModifyPerceptionMO);
+        memoryCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
+        memoryCodelet.setName("MemoryCodelet");
+        memoryCodelet.setTimeStep(0);
+        this.m.insertCodelet(memoryCodelet);
+        Logger.getLogger(MemoryCodelet.class.getName()).setLevel(Level.SEVERE);
+
         RememberCodelet rememberCodelet = new RememberCodelet(this.rememberCapacity, 15, this.rememberDuration, this.rememberDecrement, this.rememberForgetThreshold);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
         rememberCodelet.addInput(this.longMO);
@@ -399,17 +390,7 @@ public class AuxiliaryCognitiveArchitecture {
         rememberCodelet.setName("RememberCodelet");
         rememberCodelet.setTimeStep(0);
         this.m.insertCodelet(rememberCodelet);
-        
-        ShortMemoryCodelet shortMemoryCodelet = new ShortMemoryCodelet(this.shortMemoryCapacity, this.perceptionMaxActivation, this.perceptionMinActivation, this.perceptionDeleteThreshold, this.perceptionReplaceThreshold, this.perceptionIncrementPerCycle, this.perceptionDecrementPerCycle);
-        shortMemoryCodelet.addInput(this.perceptionMO);
-        shortMemoryCodelet.addInput(this.shortMO);
-        shortMemoryCodelet.addInput(this.longMO);
-        shortMemoryCodelet.addInput(this.toModifyPerceptionMO);
-        shortMemoryCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
-        shortMemoryCodelet.setName("ShortMemoryCodelet");
-        shortMemoryCodelet.setTimeStep(0);
-        this.m.insertCodelet(shortMemoryCodelet);
-        
+       
         DriveHandleCodelet driveHandleCdt = new DriveHandleCodelet(this.selfPerceptCategory, this.relevantPerceptsIncrement);
         driveHandleCdt.addInput(this.shortMO);
         driveHandleCdt.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));

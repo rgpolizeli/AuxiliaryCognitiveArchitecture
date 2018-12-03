@@ -28,5 +28,6 @@ public class MemoriesNames {
     public static final String EXECUTOR_PARAMETERS_MO = "EXECUTOR_PARAMETERS";
     public static final String ACTUATORS_MO = "ACTUATORS";
     public static final String PROXY_MO = "PROXY";
+    public static final String CREATED_PERCEPTS_MO = "CREATED_PERCEPTS";
     
 }

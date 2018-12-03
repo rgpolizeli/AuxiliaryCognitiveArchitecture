@@ -10,11 +10,16 @@ import actionSelection.ExtractedAffordance;
 import main.MemoriesNames;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import main.AuxiliarMethods;
+import perception.Percept;
 
 /**
  *
- * @author ricardo
+ * @author rgpolizeli
  */
 public class ExecutorHandleCodelet extends Codelet{
     
@@ -22,6 +27,8 @@ public class ExecutorHandleCodelet extends Codelet{
     private MemoryObject executorParametersMO;
     private MemoryObject executorHandleMO;
     private MemoryObject activatedAffordanceMO;
+    private MemoryObject workingMO;
+    private MemoryObject reasonerMO;
     private MemoryObject synchronizerMO;
     
     private ExtractedAffordance currentAffordance;
@@ -29,10 +36,63 @@ public class ExecutorHandleCodelet extends Codelet{
     private ExtractedAffordance activatedAffordance;
     private Map<String, Codelet> executors;
     
+    private final String reasonerCategoryInWMO= "REASONER";
+    
     public ExecutorHandleCodelet() {
         this.currentAffordance = null;
     }
     
+    
+    /**
+     * Deep copy of memory object.
+     * @param mo
+     * @return 
+     */
+    private Map<String,Map<Percept,Double>> getCopyOfMemoryContent(MemoryObject mo){
+        Map<String,Map<Percept,Double>> copy;
+        synchronized(mo){
+            copy =  (Map<String,Map<Percept,Double>>) mo.getI();
+            copy = AuxiliarMethods.deepCopyMemoryMap(copy);
+        }
+        return copy;
+    }
+    
+    private void addReasonerPerceptsToWorkingMO(){
+        
+        Map<String,Map<Percept,Double>> reasonerPerceptsCopy = getCopyOfMemoryContent(this.reasonerMO);
+        
+        synchronized(this.workingMO){
+            Map<String,Map<String,List<Percept>>> workingMemory = (Map<String,Map<String,List<Percept>>>) this.workingMO.getI();
+            Map<String,List<Percept>> reasonerPerceptsInWMO = workingMemory.get(this.reasonerCategoryInWMO);
+
+            if (reasonerPerceptsInWMO == null) {
+                reasonerPerceptsInWMO = new HashMap<>();
+                workingMemory.put(this.reasonerCategoryInWMO, reasonerPerceptsInWMO);
+            } else{
+                reasonerPerceptsInWMO.clear(); // ou voce apaga toda esta memoria ou e necessario uma function para apagar os percepts deletados.
+            }
+
+            for (Map.Entry<String, Map<Percept,Double>> entry : reasonerPerceptsCopy.entrySet()) {
+                String category = entry.getKey();
+                Map<Percept, Double> perceptsOfCategoryMap = entry.getValue();
+
+                if (reasonerPerceptsInWMO.containsKey(category)) {
+                    List<Percept> perceptsOfCategory = reasonerPerceptsInWMO.get(category);
+                    for (Percept p : perceptsOfCategoryMap.keySet()) {
+                        if (!perceptsOfCategory.contains(p)) {
+                            perceptsOfCategory.add(p);
+                        }
+                    }
+                } else{
+                    List<Percept> perceptsOfCategory = new ArrayList<>();
+                    perceptsOfCategory.addAll(perceptsOfCategoryMap.keySet());
+                    reasonerPerceptsInWMO.put(category, perceptsOfCategory);
+                }
+            }
+
+            workingMemory.put(this.reasonerCategoryInWMO, reasonerPerceptsInWMO);
+        }
+    }
     
    //////////////////////
    // OVERRIDE METHODS //
@@ -43,6 +103,8 @@ public class ExecutorHandleCodelet extends Codelet{
         this.executorsMO = (MemoryObject) this.getInput(MemoriesNames.EXECUTORS_MO);
         this.activatedAffordanceMO = (MemoryObject) this.getInput(MemoriesNames.ACTIVATED_AFFORDANCE_MO);
         this.executorHandleMO = (MemoryObject) this.getInput(MemoriesNames.EXECUTOR_HANDLE_MO);
+        this.reasonerMO = (MemoryObject) this.getInput(MemoriesNames.REASONER_MO);
+        this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
         
         this.executorParametersMO = (MemoryObject) this.getOutput(MemoriesNames.EXECUTOR_PARAMETERS_MO);
@@ -90,7 +152,9 @@ public class ExecutorHandleCodelet extends Codelet{
                 }
             }
         }
-       
+        
+        addReasonerPerceptsToWorkingMO();
+        
         SynchronizationMethods.synchronize(super.getName(), this.synchronizerMO);
     }
     
