@@ -5,7 +5,7 @@
  */
 package memory;
 
-import motivation.Drive;
+import br.unicamp.cst.motivational.Drive;
 import actionSelection.AffordanceType;
 import actionSelection.SynchronizationMethods;
 import actionSelection.ConsummatoryPathInfo;
@@ -27,6 +27,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 import main.AuxiliarMethods;
+import motivation.DriveHandle;
 
 /**
  *
@@ -35,7 +36,7 @@ import main.AuxiliarMethods;
 public class RememberCodelet extends Codelet{
 
     private MemoryObject longMO;
-    private MemoryObject driveMO;
+    private MemoryObject drivesHandlesMO;
     private MemoryObject rememberMO;
     private MemoryObject workingMO;
     private MemoryObject extractedAffordancesMO;
@@ -44,10 +45,10 @@ public class RememberCodelet extends Codelet{
     private List<ExtractedAffordance> extractedAffordances;
     private Map<String,List<Percept>> attentionPercepts;
     private Map<String,Map<Percept,Double>> memoryPercepts;
-    private List<Drive> drives;
-    private Map<Drive, List<Remember>> remembers;
+    private List<DriveHandle> drivesHandles;
+    private Map<DriveHandle, List<Remember>> remembers;
     private final Map<String, Integer> notRemembers; //(String = drive name + affordance parent name + affordance name)
-    private Map<Drive, Double> drivesActivations;
+    private Map<DriveHandle, Double> drivesActivations;
     
     private final int totalMemoryCapacity;
     private final int totalPerceptsPerCategory;
@@ -205,20 +206,20 @@ public class RememberCodelet extends Codelet{
     
     private void decrementRemembers(){
         synchronized(this.rememberMO){
-            Map<Drive, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
+            Map<DriveHandle, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
             
-            for (Map.Entry<Drive, List<Remember>> entry : remembersBkp.entrySet()) {
+            for (Map.Entry<DriveHandle, List<Remember>> entry : remembersBkp.entrySet()) {
                 
-                Drive factor = entry.getKey();
+                DriveHandle driveHandle = entry.getKey();
                 List<Remember> remembersOfFactorBkp = entry.getValue();
                 
-                List<Remember> remembersOfFactor = this.remembers.get(factor);
+                List<Remember> remembersOfFactor = this.remembers.get(driveHandle);
                 
                 for (Remember rb : remembersOfFactorBkp) {
                     if (rb.getDuration() == this.rememberForgetThreshold) {
                         remembersOfFactor.remove(rb);
                         if (remembersOfFactor.isEmpty()) {
-                            this.remembers.remove(factor);
+                            this.remembers.remove(driveHandle);
                         }
                     } else{
                         rb.setDuration( (rb.getDuration() - this.rememberDecrement) );
@@ -229,32 +230,32 @@ public class RememberCodelet extends Codelet{
         }
     }
     
-    private void updateRemembersToDrive(Drive drive){
-        List<Remember> remembersToDrive = this.remembers.get(drive);
+    private void updateRemembersToDrive(DriveHandle driveHandle){
+        List<Remember> remembersToDrive = this.remembers.get(driveHandle);
         
         if (remembersToDrive!=null) {
             
             for (Remember r : new ArrayList<>(remembersToDrive)) { 
                 
                 AffordanceAndParent currentAff = new AffordanceAndParent(r.getCurrentAff(), r.getParentAff());
-                if (!isInExtractedAffordances(drive,currentAff)) {
+                if (!isInExtractedAffordances(driveHandle.getDrive(),currentAff)) {
                     
                     remembersToDrive.remove(r);
                     if (remembersToDrive.isEmpty()) {
-                        this.remembers.remove(drive);
+                        this.remembers.remove(driveHandle);
                     }
 
                     int cycles;
                     
                     if (currentAff.parentAffordance == null) { //consummatory affordance
-                        cycles = drive.getConsummatoryAffordances().size();
-                        this.notRemembers.put(drive.getName()+currentAff.affordance.getAffordanceName(), cycles);
+                        cycles = driveHandle.getConsummatoryAffordances().size();
+                        this.notRemembers.put(driveHandle.getDrive().getName()+currentAff.affordance.getAffordanceName(), cycles);
                         
                         //System.out.println("DELETED: " + drive.getName()+currentAff.affordance.getAffordanceName());
                         
                     } else{
                         cycles = currentAff.parentAffordance.getIntermediateAffordances().size()-1; //quantity of other alternatives affordances
-                        this.notRemembers.put(drive.getName()+currentAff.parentAffordance.getAffordanceName()+currentAff.affordance.getAffordanceName(), cycles);
+                        this.notRemembers.put(driveHandle.getDrive().getName()+currentAff.parentAffordance.getAffordanceName()+currentAff.affordance.getAffordanceName(), cycles);
                         //System.out.println("DELETED: " + drive.getName()+currentAff.parentAffordance.getAffordanceName()+currentAff.affordance.getAffordanceName());
                     }
                 }
@@ -262,7 +263,7 @@ public class RememberCodelet extends Codelet{
         } 
     }
     
-    private List<Remember> createRemembersToDrive(Drive drive){
+    private List<Remember> createRemembersToDrive(DriveHandle driveHandle){
         
         List<Remember> newRemembersToDrive = new ArrayList<>();
 
@@ -272,7 +273,7 @@ public class RememberCodelet extends Codelet{
         List<AffordanceAndParent> affordances = new ArrayList<>();
         List<AffordanceAndParent> affordancesBkp = new ArrayList<>();
 
-        for (AffordanceType aff : drive.getConsummatoryAffordances()) {
+        for (AffordanceType aff : driveHandle.getConsummatoryAffordances()) {
             affordances.add(new AffordanceAndParent(aff, null));
             affordancesBkp.add(new AffordanceAndParent(aff, null));
         }
@@ -289,7 +290,7 @@ public class RememberCodelet extends Codelet{
         while (!openMap.get(level).isEmpty()) {
 
             currentAff = openMap.get(level).remove(0); //get and remove first
-            if (!isInNotRemember(drive,currentAff) && !hasRememberToAffordance(this.remembers.get(drive), currentAff)) {
+            if (!isInNotRemember(driveHandle.getDrive(),currentAff) && !hasRememberToAffordance(this.remembers.get(driveHandle), currentAff)) {
                 relevantPercepts = this.getRelevantPercepts(currentAff.affordance, this.memoryPercepts); 
                 if (this.isFeasible(currentAff.affordance, relevantPercepts)) {
                     
@@ -347,8 +348,8 @@ public class RememberCodelet extends Codelet{
     private void computeDrivesActivations(){
         this.drivesActivations = new HashMap<>();
         
-        for (Drive factor : this.drives) {
-            drivesActivations.put(factor, factor.getValue());
+        for (DriveHandle driveHandle : this.drivesHandles) {
+            drivesActivations.put(driveHandle, driveHandle.getDrive().getActivation());
         }
     }
     
@@ -423,8 +424,8 @@ public class RememberCodelet extends Codelet{
         return totalMemoryCapacity;
     }
     
-    private Drive getLastDrive(List<Entry<Drive,Double>> drivesValuesOrdered){
-        Drive lastDrive = null;
+    private DriveHandle getLastDrive(List<Entry<DriveHandle,Double>> drivesValuesOrdered){
+        DriveHandle lastDrive = null;
         
         if (!drivesValuesOrdered.isEmpty()) { 
             lastDrive = drivesValuesOrdered.get(drivesValuesOrdered.size()-1).getKey();
@@ -433,7 +434,7 @@ public class RememberCodelet extends Codelet{
         return lastDrive;
     }
     
-    private void removeLastDrive(Drive lastDrive,List<Entry<Drive,Double>> drivesValuesOrdered){
+    private void removeLastDrive(DriveHandle lastDrive,List<Entry<DriveHandle,Double>> drivesValuesOrdered){
         
         synchronized(this.rememberMO){
             this.remembers.remove(lastDrive);
@@ -459,38 +460,38 @@ public class RememberCodelet extends Codelet{
         return total;
     }
     
-    private void insertInRememberMO(Drive drive, List<Entry<Drive,Double>> drivesValuesOrdered){
-        
+    private void insertInRememberMO(DriveHandle driveHandle, List<Entry<DriveHandle,Double>> drivesValuesOrdered){
+        Drive drive = driveHandle.getDrive();
         List<Remember> newRemembers = null;
         
         if (countTotalOfPerceptsInRememberMO() == this.getMemoryCapacity()) { //full memory, try remove the last factor
-            Drive lastDrive = this.getLastDrive(drivesValuesOrdered);
-            if (!drive.equals(lastDrive)) { 
+            DriveHandle lastDrive = this.getLastDrive(drivesValuesOrdered);
+            if (!drive.equals(lastDrive.getDrive())) { 
                 this.removeLastDrive(lastDrive, drivesValuesOrdered);
             }
             
             if (countTotalOfPerceptsInRememberMO() < this.getMemoryCapacity()) { //if the last factor is removed.
-                newRemembers = createRemembersToDrive(drive);
+                newRemembers = createRemembersToDrive(driveHandle);
             }
             
         } else{
-            newRemembers = createRemembersToDrive(drive);
+            newRemembers = createRemembersToDrive(driveHandle);
         }
         
         if (newRemembers!=null) {
             for (Remember r : newRemembers) {
                 if (countTotalOfPerceptsInRememberMO() == this.getMemoryCapacity()){ //full memory, try remove the last factor
-                    Drive lastDrive = this.getLastDrive(drivesValuesOrdered);
-                    if (!drive.equals(lastDrive)) { 
+                    DriveHandle lastDrive = this.getLastDrive(drivesValuesOrdered);
+                    if (!drive.equals(lastDrive.getDrive())) { 
                         this.removeLastDrive(lastDrive, drivesValuesOrdered);
                     }
                 } 
 
                 if (countTotalOfPerceptsInRememberMO() < this.getMemoryCapacity()){ //if the last factor is removed.
-                    List<Remember> remembersToDrive = remembers.get(drive);
+                    List<Remember> remembersToDrive = remembers.get(driveHandle);
                     if (remembersToDrive == null) {
                         remembersToDrive =  new ArrayList<>();
-                        remembers.put(drive, remembersToDrive);
+                        remembers.put(driveHandle, remembersToDrive);
                     }
                     remembersToDrive.add(r);
                 }
@@ -501,16 +502,16 @@ public class RememberCodelet extends Codelet{
     private void removeDeletedPerceptsFromRemembers(){
         
         synchronized(this.rememberMO){
-            this.remembers = (Map<Drive, List<Remember>>) this.rememberMO.getI();
-            Map<Drive, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
+            this.remembers = (Map<DriveHandle, List<Remember>>) this.rememberMO.getI();
+            Map<DriveHandle, List<Remember>> remembersBkp = this.deepCopyRememberMap(this.remembers);
             
-            for (Map.Entry<Drive, List<Remember>> entry : remembersBkp.entrySet()) {
+            for (Map.Entry<DriveHandle, List<Remember>> entry : remembersBkp.entrySet()) {
                 
-                Drive factor = entry.getKey();
+                DriveHandle driveHandle = entry.getKey();
                 List<Remember> remembersOfFactorBkp = entry.getValue();
                 
                 for (int i = 0; i < remembersOfFactorBkp.size(); i++) {
-                    List<Remember> remembersOfFactor = this.remembers.get(factor);
+                    List<Remember> remembersOfFactor = this.remembers.get(driveHandle);
                     Remember rb = remembersOfFactor.get(i);
                     
                     Map<String, List<Percept>> rememberedPerceptsMap = rb.getRelevantPercepts();
@@ -534,7 +535,7 @@ public class RememberCodelet extends Codelet{
                                 remembersOfFactor.remove(rb);
 
                                 if(remembersOfFactor.isEmpty()){
-                                    this.remembers.remove(factor);
+                                    this.remembers.remove(driveHandle);
                                 }
                             }
                         }
@@ -590,10 +591,10 @@ public class RememberCodelet extends Codelet{
         }
     }
     
-    public Map<Drive, List<Remember>> deepCopyRememberMap(Map<Drive, List<Remember>> remembers){
+    public Map<DriveHandle, List<Remember>> deepCopyRememberMap(Map<DriveHandle, List<Remember>> remembers){
         synchronized(remembers){
-            Map<Drive, List<Remember>> remembersBkp = new HashMap<>();
-            for(Map.Entry<Drive, List<Remember>> entry : remembers.entrySet()){
+            Map<DriveHandle, List<Remember>> remembersBkp = new HashMap<>();
+            for(Map.Entry<DriveHandle, List<Remember>> entry : remembers.entrySet()){
                 remembersBkp.put( entry.getKey(),new ArrayList<>(entry.getValue()) );
             }
             return remembersBkp;
@@ -617,7 +618,7 @@ public class RememberCodelet extends Codelet{
     @Override
     public void accessMemoryObjects() {
         this.longMO = (MemoryObject) this.getInput(MemoriesNames.LONG_MO);
-        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        this.drivesHandlesMO = (MemoryObject) this.getInput(MemoriesNames.DRIVES_HANDLE_MO);
         this.rememberMO = (MemoryObject) this.getInput(MemoriesNames.REMEMBER_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
         this.extractedAffordancesMO = (MemoryObject) this.getInput(MemoriesNames.EXTRACTED_AFFORDANCES_MO);
@@ -644,14 +645,14 @@ public class RememberCodelet extends Codelet{
                 this.attentionPercepts = AuxiliarMethods.deepCopyAttentionMap(attentionPerceptsFromWorkingMemory.get("ATTENTION"));
             }
         
-            this.drives = new CopyOnWriteArrayList( (List<Drive>) this.driveMO.getI() );
+            this.drivesHandles = new CopyOnWriteArrayList( (List<DriveHandle>) this.drivesHandlesMO.getI() );
 
-            this.remembers = (Map<Drive, List<Remember>>) this.rememberMO.getI(); //don´t necessary save a actual version of this MO;
+            this.remembers = (Map<DriveHandle, List<Remember>>) this.rememberMO.getI(); //don´t necessary save a actual version of this MO;
             
             if (this.remembers.isEmpty() || (!this.remembers.isEmpty() && (this.AffordanceExtractorTimeStamp == -Long.MIN_VALUE || this.extractedAffordancesMO.getTimestamp() > this.AffordanceExtractorTimeStamp)) ){ //all remembers were read.
                
                 this.computeDrivesActivations(); // mount a map for drives to order;
-                List<Entry<Drive,Double>> drivesValuesOrdered = AuxiliarMethods.descSortEntriesByValues(this.drivesActivations);
+                List<Entry<DriveHandle,Double>> drivesValuesOrdered = AuxiliarMethods.descSortEntriesByValues(this.drivesActivations);
                     
                 this.extractedAffordances = new CopyOnWriteArrayList((List<ExtractedAffordance>) this.extractedAffordancesMO.getI() );
                 
@@ -659,11 +660,11 @@ public class RememberCodelet extends Codelet{
                 decrementRemembers();
                 
                 synchronized(this.rememberMO){ //necessary to synchronize with affordanceExtractorCodelet
-                    for (Entry<Drive,Double> entry : drivesValuesOrdered) {
+                    for (Entry<DriveHandle,Double> entry : drivesValuesOrdered) {
 
-                        Drive drive = entry.getKey();
-                        updateRemembersToDrive(drive);
-                        insertInRememberMO(drive,drivesValuesOrdered);
+                        DriveHandle driveHandle = entry.getKey();
+                        updateRemembersToDrive(driveHandle);
+                        insertInRememberMO(driveHandle,drivesValuesOrdered);
                     }
 
                     /*

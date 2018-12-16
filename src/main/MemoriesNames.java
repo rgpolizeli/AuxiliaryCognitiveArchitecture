@@ -13,7 +13,7 @@ public class MemoriesNames {
     public static final String PERCEPTION_MO = "PERCEPTION";
     public static final String SHORT_MO = "SHORT_MEMORY";
     public static final String LONG_MO = "LONG_MEMORY";
-    public static final String DRIVE_MO = "DRIVE"; 
+    public static final String DRIVES_HANDLE_MO = "DRIVES_HANDLES"; 
     public static final String WORKING_MO = "WORKING_MEMORY"; 
     public static final String EXTRACTED_AFFORDANCES_MO = "EXTRACTED_AFFORDANCE";
     public static final String ACTIVATED_AFFORDANCE_MO = "ACTIVATED_AFFORDANCE";

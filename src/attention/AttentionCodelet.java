@@ -20,7 +20,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import main.AuxiliarMethods;
-import motivation.Drive;
+import br.unicamp.cst.motivational.Drive;
+import motivation.DriveHandle;
 
 /**
  *
@@ -51,13 +52,13 @@ public class AttentionCodelet extends Codelet{
     
     private MemoryObject shortMO;
     private MemoryObject workingMO;
-    private MemoryObject driveMO;
+    private MemoryObject drivesHandlesMO;
     private MemoryObject synchronizerMO;
     
     private Map<String,Map<Percept, Double>> extractedPerceptsFromShortMO;
     private Map<String,List<Percept>> attentionPercepts;
     private Map<String,Map<Percept, Double>> shortPerceptsMap;
-    private List<Drive> drives;
+    private List<DriveHandle> drivesHandles;
 
     private List<Property> salientProperties;
     private double salienceBias = 0.3;
@@ -83,7 +84,7 @@ public class AttentionCodelet extends Codelet{
     
     private void computePerceptsAttentionValues(){
         this.extractedPerceptsFromShortMO = new HashMap<>();
-        this.drives = new CopyOnWriteArrayList( (List<Drive>) driveMO.getI());
+        this.drivesHandles = new CopyOnWriteArrayList( (List<DriveHandle>) drivesHandlesMO.getI());
 
         for (Map<Percept, Double> perceptsMap : this.shortPerceptsMap.values()) {
             for (Percept p : perceptsMap.keySet()) {
@@ -263,25 +264,26 @@ public class AttentionCodelet extends Codelet{
         double benefit = 0.0;
         List<AffodanceTypeToPercept> affordancesToPercept;
         
-        for (Drive factor : this.drives) {
-            for (ConsummatoryAffordanceType consummatoryAff : factor.getConsummatoryAffordances()) {
+        for (DriveHandle driveHandle : this.drivesHandles) {
+            
+            for (ConsummatoryAffordanceType consummatoryAff : driveHandle.getConsummatoryAffordances()) {
                 affordancesToPercept = this.searchAffordancesTypesToPercept(consummatoryAff, p);
-                benefit += computeAffordancesBenefit(consummatoryAff, factor, affordancesToPercept, p); //benefit
+                benefit += computeAffordancesBenefit(consummatoryAff, driveHandle.getDrive(), affordancesToPercept, p); //benefit
             }
         }
      
         return (this.drivesBias*benefit);
     }
     
-    private double computeAffordancesBenefit(ConsummatoryAffordanceType consummatoryAffordance, Drive factor, List<AffodanceTypeToPercept> affordancesToPercept, Percept p){
+    private double computeAffordancesBenefit(ConsummatoryAffordanceType consummatoryAffordance, Drive drive, List<AffodanceTypeToPercept> affordancesToPercept, Percept p){
         double benefit = 0.0;
         
         if (!affordancesToPercept.isEmpty()) {
             for (AffodanceTypeToPercept affToPercept : affordancesToPercept) {
                 if (affToPercept.aff.equals((AffordanceType)consummatoryAffordance))
-                    benefit +=  factor.getValue(); 
+                    benefit +=  drive.getActivation(); 
                 else
-                    benefit +=  (1.0/(double)affToPercept.hierarchyContribution) * factor.getValue();
+                    benefit +=  (1.0/(double)affToPercept.hierarchyContribution) * drive.getActivation();
             }
         }
         
@@ -322,7 +324,7 @@ public class AttentionCodelet extends Codelet{
     public void accessMemoryObjects() {
         this.shortMO = (MemoryObject) this.getInput(MemoriesNames.SHORT_MO);
         this.workingMO = (MemoryObject) this.getInput(MemoriesNames.WORKING_MO);
-        this.driveMO = (MemoryObject) this.getInput(MemoriesNames.DRIVE_MO);
+        this.drivesHandlesMO = (MemoryObject) this.getInput(MemoriesNames.DRIVES_HANDLE_MO);
         this.synchronizerMO = (MemoryObject) this.getInput(MemoriesNames.SYNCHRONIZER_MO);
     }
 

@@ -10,12 +10,16 @@ import br.unicamp.cst.core.entities.Codelet;
 import synchronization.MyLock;
 import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
  * @author rgpolizeli
  */
 public class SynchronizationCognitiveArchitecture {
+    
+    private static final Logger LOGGER = Logger.getLogger(SynchronizationCognitiveArchitecture.class.getName());
     
     public SynchronizationCognitiveArchitecture() {
     }
@@ -24,9 +28,12 @@ public class SynchronizationCognitiveArchitecture {
         SynchronizationMethods.getSynchronizerLock().lock();
         Map<String, MyLock> myLocks = (Map<String, MyLock>) synchronizerMO.getI();
         try{
+            
             executorHandleMO.setI(Boolean.FALSE);
             codelet.setLoop(Boolean.FALSE);
             SynchronizationMethods.destroyLock(executorName, myLocks);
+            
+            
         } finally{
             SynchronizationMethods.getSynchronizerLock().unlock();
         }

@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import main.AuxiliarMethods;
 import perception.Percept;
 
@@ -37,6 +39,8 @@ public class ExecutorHandleCodelet extends Codelet{
     private Map<String, Codelet> executors;
     
     private final String reasonerCategoryInWMO= "REASONER";
+    
+    private final Logger LOGGER = Logger.getLogger(ExecutorHandleCodelet.class.getName());
     
     public ExecutorHandleCodelet() {
         this.currentAffordance = null;
@@ -138,15 +142,20 @@ public class ExecutorHandleCodelet extends Codelet{
                         Codelet executor = this.executors.get(this.activatedAffordance.getAffordanceType().getAffordanceName());
                         this.executorHandleMO.setI(Boolean.TRUE); //executor in execution
                         SynchronizationMethods.createLock(executor.getName(), this.synchronizerMO);
-                        executor.setLoop(Boolean.TRUE);
+                        executor.setLoop(Boolean.FALSE);
                         executor.setTimeStep(0);
                         executor.start();
-
+                        
+                        LOGGER.log(Level.INFO, "Executor codelet {0} initiated.", new Object[]{executor.getName()});
+                        
                         this.currentAffordance = this.activatedAffordance;
+                        
                     } else{ //clean variables
+                        
                         this.activatedAffordance = null;
                         this.activatedAffordanceMO.setI(this.activatedAffordance);
                         this.currentAffordance = null;
+                        LOGGER.log(Level.INFO, "Cleaned variables.");
                     }
                     
                 }

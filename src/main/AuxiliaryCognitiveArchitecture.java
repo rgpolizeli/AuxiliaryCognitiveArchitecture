@@ -6,6 +6,7 @@
 package main;
 
 import actionSelection.ActionSelectionMechanism;
+import actionSelection.ConsummatoryAffordanceType;
 import attention.AttentionCodelet;
 import executor.ExecutorHandleCodelet;
 import memory.Remember;
@@ -23,8 +24,9 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import memory.MemoryCodelet;
-import motivation.Drive;
-import motivation.DriveHandleCodelet;
+import br.unicamp.cst.motivational.Drive;
+import motivation.DriveHandle;
+import motivation.DrivesHandlerCodelet;
 
 /**
  *
@@ -41,6 +43,7 @@ public class AuxiliaryCognitiveArchitecture {
     private MemoryObject reasonerMO;
     private MemoryObject createdPerceptsMO;
     private MemoryObject rememberMO;
+    private MemoryObject drivesHandlesMO;
     private MemoryObject toModifyPerceptionMO;
     private MemoryObject executorHandleMO;
     private MemoryObject executorsMO;
@@ -88,7 +91,7 @@ public class AuxiliaryCognitiveArchitecture {
     private String selfPerceptCategory;
     private double relevantPerceptsIncrement = -1.0;
     
-    private List<Drive> drives;
+    private List<DriveHandle> drivesHandles;
     
     public AuxiliaryCognitiveArchitecture(Mind m) {
         this.m = m;
@@ -100,7 +103,8 @@ public class AuxiliaryCognitiveArchitecture {
         this.selfPerceptCategory = selfPcptCategory;
     }
     
-    public void setDriveHandleParameters(double relevantPerceptsIncrement){
+    public void setDriveHandleParameters(List<DriveHandle> drivesHandles, double relevantPerceptsIncrement){
+        this.drivesHandles = drivesHandles;
         this.relevantPerceptsIncrement = relevantPerceptsIncrement;
     }
     
@@ -117,11 +121,9 @@ public class AuxiliaryCognitiveArchitecture {
         this.salienceBias = salienceBias;
     }
     
-    public void setActionSelectionParameters(List<Drive> drives, double maxAffordanceActivation, double minAffordanceActivation, double activationThreshold, double decrementPerCount){
-        this.drives = drives;
+    public void setActionSelectionParameters(List<ConsummatoryAffordanceType> consummatoryAffordanceTypes, double maxAffordanceActivation, double minAffordanceActivation, double activationThreshold, double decrementPerCount){
         this.asbac.setCountParameters(maxAffordanceActivation, minAffordanceActivation, activationThreshold, decrementPerCount);
-        this.asbac.setDrives(drives);
-        
+        this.asbac.setConsummatoryAffordances(consummatoryAffordanceTypes);   
     }
     
     public void setExecutors(Map<String, Codelet> executors){
@@ -186,6 +188,9 @@ public class AuxiliaryCognitiveArchitecture {
         
         Map<Drive, List<Remember>> remembers = new HashMap<>();
         this.rememberMO = m.createMemoryObject(MemoriesNames.REMEMBER_MO, remembers);
+        
+        List<DriveHandle> drivesHandles = new ArrayList<>();
+        this.drivesHandlesMO = m.createMemoryObject(MemoriesNames.DRIVES_HANDLE_MO, drivesHandles);
         
         List<Percept> toModifyPerception = new ArrayList<>();
         this.toModifyPerceptionMO = m.createMemoryObject(MemoriesNames.TO_MODIFY_PERCEPTION_MO, toModifyPerception);
@@ -331,7 +336,7 @@ public class AuxiliaryCognitiveArchitecture {
             throw new IllegalArgumentException();
         }
         
-        if (this.drives == null) {
+        if (this.drivesHandles == null) {
             throw new IllegalArgumentException();
         }
     }
@@ -343,7 +348,7 @@ public class AuxiliaryCognitiveArchitecture {
         AttentionCodelet attentionCodelet = new AttentionCodelet(this.salienceProperties, this.salienceBias, this.attentionMemoryCapacity);
         attentionCodelet.addInput(this.shortMO);
         attentionCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
-        attentionCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
+        attentionCodelet.addInput(this.drivesHandlesMO);
         attentionCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
         attentionCodelet.setName("AttentionCodelet");
         attentionCodelet.setTimeStep(0);
@@ -361,6 +366,7 @@ public class AuxiliaryCognitiveArchitecture {
         executorHandleCodelet.setName("ExecutorHandleCodelet");
         executorHandleCodelet.setTimeStep(0);
         this.m.insertCodelet(executorHandleCodelet);
+        Logger.getLogger(ExecutorHandleCodelet.class.getName()).setLevel(Level.SEVERE);
         
         MemoryCodelet memoryCodelet = new MemoryCodelet(longMemoryMaxActivation,longMemoryMinActivation,
                 shortMemoryCapacity, shortMemoryDeleteThreshold, shortMemoryReplaceThreshold, shortMemoryIncrementPerCycle, shortMemoryDecrementPerCycle, 
@@ -382,7 +388,7 @@ public class AuxiliaryCognitiveArchitecture {
         RememberCodelet rememberCodelet = new RememberCodelet(this.rememberCapacity, 15, this.rememberDuration, this.rememberDecrement, this.rememberForgetThreshold);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.WORKING_MO));
         rememberCodelet.addInput(this.longMO);
-        rememberCodelet.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
+        rememberCodelet.addInput(this.drivesHandlesMO);
         rememberCodelet.addInput(this.reasonerMO);
         rememberCodelet.addInput(this.rememberMO);
         rememberCodelet.addInput(getMemoryByName(MemoriesNames.EXTRACTED_AFFORDANCES_MO));
@@ -391,13 +397,18 @@ public class AuxiliaryCognitiveArchitecture {
         rememberCodelet.setTimeStep(0);
         this.m.insertCodelet(rememberCodelet);
        
-        DriveHandleCodelet driveHandleCdt = new DriveHandleCodelet(this.selfPerceptCategory, this.relevantPerceptsIncrement);
-        driveHandleCdt.addInput(this.shortMO);
-        driveHandleCdt.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
-        driveHandleCdt.addInput(getMemoryByName(MemoriesNames.DRIVE_MO));
-        driveHandleCdt.setName("DriveHandleCodelet");
-        driveHandleCdt.setTimeStep(0);
-        this.m.insertCodelet(driveHandleCdt);
+        DrivesHandlerCodelet drivesHandlerCodelet = new DrivesHandlerCodelet(this.selfPerceptCategory, this.relevantPerceptsIncrement);
+        drivesHandlerCodelet.addInput(this.shortMO);
+        drivesHandlerCodelet.addInput(getMemoryByName(MemoriesNames.SYNCHRONIZER_MO));
+        drivesHandlerCodelet.addInput(this.drivesHandlesMO);
+        drivesHandlerCodelet.setName("DrivesHandlerCodelet");
+        drivesHandlerCodelet.setTimeStep(0);
+        this.m.insertCodelet(drivesHandlerCodelet);
+        Logger.getLogger(DrivesHandlerCodelet.class.getName()).setLevel(Level.SEVERE);
+        
+        this.drivesHandlesMO.setI(this.drivesHandles);
+        
+        Logger.getLogger(SynchronizationCognitiveArchitecture.class.getName()).setLevel(Level.SEVERE);
         
         this.asbac.createCodelets();
     }
