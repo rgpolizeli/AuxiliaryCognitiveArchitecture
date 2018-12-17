@@ -176,6 +176,43 @@ public class MemoryCodelet extends Codelet{
     }
     
     /**
+     * Get a relation with the type relationType in the list of relations relations. 
+     * @param relationType
+     * @param relations
+     * @return Relation if there is relation with the type, null otherwise.
+     */
+    private Relation getRelationByTypeInList(String relationType, List<Relation> relations){
+        for(Relation r : relations){
+            if(r.getType().equals(relationType)){
+                return r;
+            }
+        }
+        return null;
+    }
+    
+    
+    /**
+     * Get relations that must will be deleted, i.e., the relations contained in currentRelations whose type is not contained in newRelations.
+     * @param currentRelations
+     * @param newRelations
+     * @return List<Relation> a list with the to delete relations.
+     */
+    private List<Relation> getDeletedRelations(List<Relation> currentRelations, List<Relation> newRelations){
+        
+        List<Relation> deletedRelations = new ArrayList<>();
+        
+        for (Relation currentRelation : currentRelations) {
+            String currentRelationType = currentRelation.getType();
+            Relation r = this.getRelationByTypeInList(currentRelationType, newRelations);
+            if(r == null){
+                deletedRelations.add(currentRelation);
+            }
+        }
+        
+        return deletedRelations;
+    }
+    
+    /**
      * Update relations of percept currentPercept with the updated version of the same percept.
      * @param newPercept
      * @param currentPercept 
@@ -184,13 +221,12 @@ public class MemoryCodelet extends Codelet{
         List<Relation> newRelations = newPercept.getRelations();
         List<Relation> currentRelations = currentPercept.getRelations();
         
-        currentRelations.removeAll(newRelations); //get relations that must will be deleted.
+        List<Relation> deletedRelations = this.getDeletedRelations(currentRelations,newRelations);
         
-        for (Relation currentRelation : currentRelations) {
-            if (currentPercept.removeRelation(currentRelation) == 1) {
-                
-            } else{
-                //err
+        for (Relation deletedRelation : deletedRelations) {
+            
+            if (currentPercept.removeRelation(deletedRelation) != 1) {
+                LOGGER.log(Level.SEVERE, "AusentRelationDeletionException");
             }
 
         }
@@ -250,7 +286,7 @@ public class MemoryCodelet extends Codelet{
             }
 
         } else{
-            //Exception
+            LOGGER.log(Level.SEVERE, "AusentPerceptCategoryInMemoryException");
         }
     }
     
