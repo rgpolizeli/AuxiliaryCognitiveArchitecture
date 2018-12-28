@@ -7,7 +7,7 @@ package motivation;
 
 import actionSelection.ConsummatoryAffordanceType;
 import perception.Percept;
-import perception.Property;
+import br.unicamp.cst.representation.owrl.Property;
 import java.util.List;
 import br.unicamp.cst.motivational.Drive;
 

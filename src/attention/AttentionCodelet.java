@@ -11,7 +11,7 @@ import actionSelection.ConsummatoryAffordanceType;
 import actionSelection.IntermediateAffordanceType;
 import main.MemoriesNames;
 import perception.Percept;
-import perception.Property;
+import br.unicamp.cst.representation.owrl.Property;
 import br.unicamp.cst.core.entities.Codelet;
 import br.unicamp.cst.core.entities.MemoryObject;
 import java.util.ArrayList;

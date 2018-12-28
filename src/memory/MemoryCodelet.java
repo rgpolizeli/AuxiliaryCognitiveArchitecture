@@ -19,7 +19,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import main.AuxiliarMethods;
 import perception.Percept;
-import perception.Property;
+import br.unicamp.cst.representation.owrl.Property;
+import br.unicamp.cst.representation.owrl.QualityDimension;
 import perception.Relation;
 
 
@@ -243,7 +244,6 @@ public class MemoryCodelet extends Codelet{
      * @param incrementPerCycle
      * @param maxActivation 
      */
-    
     private void incrementPerceptInMemory(Percept percept, MemoryObject mo, double incrementPerCycle, double maxActivation){
         Map<String,Map<Percept, Double>> memoryMap = (Map<String,Map<Percept, Double>>) mo.getI();
         Map<Percept, Double> memoryPerceptsOfCategory = memoryMap.get(percept.getCategory());
@@ -261,7 +261,7 @@ public class MemoryCodelet extends Codelet{
     }
     
     /**
-     * Refresh the properties and relations of the percept with the new version of the same percept.
+     * Refresh the properties and relations of the percept with the new version of the same percept.It is assumed that properties and their quality dimensions are not removed, only their values changed, and that there are no quality dimensions with the same name within the same property.
      * @param newPercept
      * @param currentPercept
      * @param mo 
@@ -272,9 +272,12 @@ public class MemoryCodelet extends Codelet{
         Map<Percept, Double> memoryPerceptsOfCategory = memoryMap.get(currentPercept.getCategory());
         
         if(memoryPerceptsOfCategory != null){
-            
-            for (Property prop : newPercept.getProperties()) {
-                currentPercept.setPropertyValue(prop.getType(), prop.getValue());
+            for (Property newProperty : newPercept.getProperties()) {
+                Property currentProperty = currentPercept.getPropertyByType(newProperty.getName());
+                for(QualityDimension newQd : newProperty.getQualityDimensions()){
+                    QualityDimension currentQd = (QualityDimension)currentProperty.search(newQd.getName()).get(0);
+                    currentQd.setValue(newQd.getValue());
+                }
             }
 
             this.refreshRelations(newPercept, currentPercept);
@@ -284,7 +287,6 @@ public class MemoryCodelet extends Codelet{
             synchronized(mo){
                 memoryPerceptsOfCategory.replace(currentPercept, perceptActivation);
             }
-
         } else{
             LOGGER.log(Level.SEVERE, "AusentPerceptCategoryInMemoryException");
         }
