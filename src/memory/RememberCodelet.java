@@ -8,9 +8,7 @@ package memory;
 import br.unicamp.cst.motivational.Drive;
 import actionSelection.AffordanceType;
 import actionSelection.SynchronizationMethods;
-import actionSelection.ConsummatoryPathInfo;
 import actionSelection.ExtractedAffordance;
-import actionSelection.IntermediateAffordanceType;
 import main.MemoriesNames;
 import perception.Percept;
 import br.unicamp.cst.core.entities.Codelet;
@@ -151,16 +149,14 @@ public class RememberCodelet extends Codelet{
     
     private boolean isInExtractedAffordances(Drive drive,AffordanceAndParent affAndParent){
         for (ExtractedAffordance extAff : this.extractedAffordances) {
-            if (extAff.getAffordanceType().equals(affAndParent.affordance)) {
-                for (ConsummatoryPathInfo consummatoryPath : extAff.getConsummatoryPaths()) {
-                    List<IntermediateAffordanceType> intermediateAffordances = consummatoryPath.getIntermediateAffordancesToDrive(drive);
-                    if (intermediateAffordances != null) {
-                        for (IntermediateAffordanceType intermediateAffordance : intermediateAffordances) {
-                            if (intermediateAffordance.getAffordance().equals(affAndParent.affordance) && intermediateAffordance.getParentAffordance().equals(affAndParent.parentAffordance)) {
-                                return true;
-                            }
+            if (extAff.getAffordanceName().equals(affAndParent.affordance.getAffordanceName())) {
+                List<AffordanceType> affordanceTypesToDrive = extAff.getHierachiesNodes().get(drive);
+                if(affordanceTypesToDrive!=null){
+                    for (AffordanceType affordanceType : affordanceTypesToDrive) {
+                        if (affordanceType.equals(affAndParent.affordance)) {
+                            return true;
                         }
-                    }   
+                    }
                 }
             }
         }
@@ -254,7 +250,7 @@ public class RememberCodelet extends Codelet{
                         //System.out.println("DELETED: " + drive.getName()+currentAff.affordance.getAffordanceName());
                         
                     } else{
-                        cycles = currentAff.parentAffordance.getIntermediateAffordances().size()-1; //quantity of other alternatives affordances
+                        cycles = currentAff.parentAffordance.getChildren().size()-1; //quantity of other alternatives affordances
                         this.notRemembers.put(driveHandle.getDrive().getName()+currentAff.parentAffordance.getAffordanceName()+currentAff.affordance.getAffordanceName(), cycles);
                         //System.out.println("DELETED: " + drive.getName()+currentAff.parentAffordance.getAffordanceName()+currentAff.affordance.getAffordanceName());
                     }
@@ -321,7 +317,7 @@ public class RememberCodelet extends Codelet{
                 openMapBkp.put(level+1, affordancesBkp);
             }
 
-            for (AffordanceType aff : currentAff.affordance.getIntermediateAffordancesAsAffordancesList()) {
+            for (AffordanceType aff : currentAff.affordance.getChildren()) {
                 affordances.add(new AffordanceAndParent(aff, currentAff.affordance));
                 affordancesBkp.add(new AffordanceAndParent(aff, currentAff.affordance));
             }

@@ -6,7 +6,7 @@
 package main;
 
 import actionSelection.ActionSelectionMechanism;
-import actionSelection.ConsummatoryAffordanceType;
+import actionSelection.AffordanceType;
 import attention.AttentionCodelet;
 import executor.ExecutorHandleCodelet;
 import memory.Remember;
@@ -121,9 +121,8 @@ public class AuxiliaryCognitiveArchitecture {
         this.salienceBias = salienceBias;
     }
     
-    public void setActionSelectionParameters(List<ConsummatoryAffordanceType> consummatoryAffordanceTypes, double maxAffordanceActivation, double minAffordanceActivation, double activationThreshold, double decrementPerCount){
-        this.asbac.setCountParameters(maxAffordanceActivation, minAffordanceActivation, activationThreshold, decrementPerCount);
-        this.asbac.setConsummatoryAffordances(consummatoryAffordanceTypes);   
+    public void setActionSelectionParameters(double maxAffordanceActivation, double minAffordanceActivation, double activationThreshold, double decrementPerCount){
+        this.asbac.setCountParameters(maxAffordanceActivation, minAffordanceActivation, activationThreshold, decrementPerCount); 
     }
     
     public void setExecutors(Map<String, Codelet> executors){

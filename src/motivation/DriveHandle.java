@@ -5,7 +5,7 @@
  */
 package motivation;
 
-import actionSelection.ConsummatoryAffordanceType;
+import actionSelection.AffordanceType;
 import perception.Percept;
 import br.unicamp.cst.representation.owrl.Property;
 import java.util.List;
@@ -20,7 +20,7 @@ public abstract class DriveHandle{
     private Drive drive;
     private List<String> propertiesNames;
     private List<String> relevantPerceptsCategories;
-    private List<ConsummatoryAffordanceType> consummatoryAffordances;
+    private List<AffordanceType> consummatoryAffordances;
     private double minActivation = 0.0;
     private double maxActivation = 1.0;
     
@@ -33,7 +33,7 @@ public abstract class DriveHandle{
      * @param minActivation The minimum activation value of this drive.
      * @param maxActivation The maximum activation value of this drive.
      */
-    public DriveHandle(Drive drive, List<String> propertiesNames, List<String> relevantPerceptsCategories, List<ConsummatoryAffordanceType> consummatoryAffordances, double minActivation, double maxActivation) {
+    public DriveHandle(Drive drive, List<String> propertiesNames, List<String> relevantPerceptsCategories, List<AffordanceType> consummatoryAffordances, double minActivation, double maxActivation) {
         setDrive(drive);
         setRelevantPropertiesNames(propertiesNames);
         setRelevantPerceptsCategories(relevantPerceptsCategories);
@@ -58,7 +58,7 @@ public abstract class DriveHandle{
         return this.relevantPerceptsCategories;
     }
     
-    public List<ConsummatoryAffordanceType> getConsummatoryAffordances() {
+    public List<AffordanceType> getConsummatoryAffordances() {
         return this.consummatoryAffordances;
     }
     
@@ -82,7 +82,7 @@ public abstract class DriveHandle{
         this.relevantPerceptsCategories = relevantPerceptsCategories;
     }
     
-    public void setConsummatoryAffordances(List<ConsummatoryAffordanceType> consummatoryAffordances) {
+    public void setConsummatoryAffordances(List<AffordanceType> consummatoryAffordances) {
         this.consummatoryAffordances = consummatoryAffordances;
     }
     

@@ -127,19 +127,19 @@ public class ExecutorHandleCodelet extends Codelet{
             
             this.activatedAffordance = (ExtractedAffordance) this.activatedAffordanceMO.getI();
             
-            if (this.activatedAffordance != null && this.executors.get(this.activatedAffordance.getAffordanceType().getAffordanceName()) != null) { //if there is activatedAffordance and if there is an executor to this activated, i.e., if this activated affordance don't trigger reasoner operations.
+            if (this.activatedAffordance != null && this.executors.get(this.activatedAffordance.getAffordanceName()) != null) { //if there is activatedAffordance and if there is an executor to this activated, i.e., if this activated affordance don't trigger reasoner operations.
 
                 boolean alreadyInExecution = (boolean) this.executorHandleMO.getI();
                 Codelet currentExecutor = null;
                 if (this.currentAffordance != null) {
-                    currentExecutor = this.executors.get(this.currentAffordance.getAffordanceType().getAffordanceName());
+                    currentExecutor = this.executors.get(this.currentAffordance.getAffordanceName());
                 }
                 if( !alreadyInExecution && (currentExecutor == null || !currentExecutor.isLoop()) ){ //if any executor isn't in execution and the current executor alreay free system's synchronization lock
                     
                     if (!this.activatedAffordance.equals(this.currentAffordance)) { //start the new executor's codelet
                         
                         this.executorParametersMO.setI(this.activatedAffordance.getPerceptsPermutation());
-                        Codelet executor = this.executors.get(this.activatedAffordance.getAffordanceType().getAffordanceName());
+                        Codelet executor = this.executors.get(this.activatedAffordance.getAffordanceName());
                         this.executorHandleMO.setI(Boolean.TRUE); //executor in execution
                         SynchronizationMethods.createLock(executor.getName(), this.synchronizerMO);
                         executor.setLoop(Boolean.FALSE);

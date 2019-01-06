@@ -7,8 +7,6 @@ package attention;
 
 import actionSelection.AffordanceType;
 import actionSelection.SynchronizationMethods;
-import actionSelection.ConsummatoryAffordanceType;
-import actionSelection.IntermediateAffordanceType;
 import main.MemoriesNames;
 import perception.Percept;
 import br.unicamp.cst.representation.owrl.Property;
@@ -31,13 +29,11 @@ public class AttentionCodelet extends Codelet{
 
     class AffodanceTypeToPercept{
         public AffordanceType aff;
-        public IntermediateAffordanceType interAff;
         public int hierarchyContribution;
         public String perceptCategory;
 
-        public AffodanceTypeToPercept(AffordanceType aff, IntermediateAffordanceType interAff, int hierarchyContribution, String perceptType) {
+        public AffodanceTypeToPercept(AffordanceType aff, int hierarchyContribution, String perceptType) {
             this.aff = aff;
-            this.interAff = interAff;
             this.hierarchyContribution = hierarchyContribution;
             this.perceptCategory = perceptType;
         }
@@ -211,39 +207,38 @@ public class AttentionCodelet extends Codelet{
     //}
     
     
-    private List<AffodanceTypeToPercept> searchAffordancesTypesToPercept(ConsummatoryAffordanceType consummatoryAffordance, Percept p){
+    private List<AffodanceTypeToPercept> searchAffordancesTypesToPercept(AffordanceType consummatoryAffordance, Percept p){
         
         List<AffodanceTypeToPercept> affordancesToPercept = new ArrayList<>();
         int level; //level in tree;
-        Map<Integer, List<IntermediateAffordanceType>> openMap; // explored affordances
+        Map<Integer, List<AffordanceType>> openMap; // explored affordances
         
         if ( consummatoryAffordance.isRelevantPercept(p) ) { //if percept p is relevant to current affordance type
-            AffodanceTypeToPercept affToPercept = new AffodanceTypeToPercept(consummatoryAffordance,  null, 1, p.getCategory());
+            AffodanceTypeToPercept affToPercept = new AffodanceTypeToPercept(consummatoryAffordance, 1, p.getCategory());
             affordancesToPercept.add(affToPercept);
         }
 
         level = 2;
         openMap = new HashMap<>();
-        openMap.put(level, consummatoryAffordance.getIntermediateAffordances());
+        openMap.put(level, consummatoryAffordance.getChildren());
 
         boolean endSearch = false;
 
-        while(!endSearch){ //Breadth-first search = busca em largura
+        while(!endSearch){ //Breadth-first search
 
-            List<IntermediateAffordanceType> intermediateAffordances = openMap.get(level);
+            List<AffordanceType> intermediateAffordances = openMap.get(level);
 
-            for (IntermediateAffordanceType intermediateAff : intermediateAffordances) {
-                AffordanceType aff = intermediateAff.getAffordance();
+            for (AffordanceType intermediateAff : intermediateAffordances) {
                 
-                if (aff.isRelevantPercept(p)) { //if percept p is relevant, add it in List
-                    AffodanceTypeToPercept affToPercept = new AffodanceTypeToPercept(aff, intermediateAff, level, p.getCategory());
+                if (intermediateAff.isRelevantPercept(p)) { //if percept p is relevant, add it in List
+                    AffodanceTypeToPercept affToPercept = new AffodanceTypeToPercept(intermediateAff, level, p.getCategory());
                     affordancesToPercept.add(affToPercept);
                 } 
                 if (openMap.containsKey(level+1)) {
-                    List<IntermediateAffordanceType> inferiorIntermediateAffordances = openMap.get(level+1);
-                    inferiorIntermediateAffordances.addAll(aff.getIntermediateAffordances());
+                    List<AffordanceType> inferiorIntermediateAffordances = openMap.get(level+1);
+                    inferiorIntermediateAffordances.addAll(intermediateAff.getChildren());
                 } else{
-                    openMap.put(level+1, new ArrayList<>(aff.getIntermediateAffordances()));
+                    openMap.put(level+1, new ArrayList<>(intermediateAff.getChildren()));
                 }
 
             }
@@ -266,7 +261,7 @@ public class AttentionCodelet extends Codelet{
         
         for (DriveHandle driveHandle : this.drivesHandles) {
             
-            for (ConsummatoryAffordanceType consummatoryAff : driveHandle.getConsummatoryAffordances()) {
+            for (AffordanceType consummatoryAff : driveHandle.getConsummatoryAffordances()) {
                 affordancesToPercept = this.searchAffordancesTypesToPercept(consummatoryAff, p);
                 benefit += computeAffordancesBenefit(consummatoryAff, driveHandle.getDrive(), affordancesToPercept, p); //benefit
             }
@@ -275,7 +270,7 @@ public class AttentionCodelet extends Codelet{
         return (this.drivesBias*benefit);
     }
     
-    private double computeAffordancesBenefit(ConsummatoryAffordanceType consummatoryAffordance, Drive drive, List<AffodanceTypeToPercept> affordancesToPercept, Percept p){
+    private double computeAffordancesBenefit(AffordanceType consummatoryAffordance, Drive drive, List<AffodanceTypeToPercept> affordancesToPercept, Percept p){
         double benefit = 0.0;
         
         if (!affordancesToPercept.isEmpty()) {
